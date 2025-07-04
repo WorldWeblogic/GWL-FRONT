@@ -20,20 +20,20 @@ const LowerManagerCompanyPage = () => {
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            toast.success('company deleted Successfully!');
+            toast.success('Delete company request send to supermanager Successfully!');
+            await handleSendMail();
         } catch (err) {
             const message = "deletion failed";
             toast.error(message);
             console.error("delete error:", err);
         }
     }
-    const handleSendMail = async (e) => {
-        e.preventDefault();
+    const handleSendMail = async () => {
         try {
             const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Offer notification came for Approval",
-                text: "This is a test email sent from MERN app.",
+                to: "shantanu.kr.worldweblogic@gmail.com",
+                subject: "Deleting company came for Approval",
+                text: "This is a test email sent for offer deleting.",
             });
 
             toast.success(response.data.message);
@@ -125,7 +125,7 @@ const LowerManagerCompanyPage = () => {
                                                     <PencilLine size={16} /> Manage
                                                 </button>
                                             </Link>
-                                            <button onClick={(e) => { softdeletecompany(company._id); handleSendMail(e); }}
+                                            <button onClick={() => { softdeletecompany(company._id) }}
                                                 className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded">
                                                 <Trash size={16} /> Delete
                                             </button>

@@ -15,20 +15,20 @@ const LowerManagerEmployee = () => {
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            toast.success("employee deleted Successfully!");
+            toast.success("Delete employee request send to super manager Successfully!");
+            await handleSendMail();
         } catch (err) {
             const message = err.response?.data?.message || "deletion failed";
             toast.error(message);
             console.error("delete error:", err);
         }
     };
-    const handleSendMail = async (e) => {
-        e.preventDefault();
+    const handleSendMail = async () => {
         try {
             const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Offer notification came for Approval",
-                text: "This is a test email sent from MERN app.",
+                to: "shantanu.kr.worldweblogic@gmail.com",
+                subject: "Deleting employee came for Approval",
+                text: "This is a test email sent for offer deleting.",
             });
 
             toast.success(response.data.message);
@@ -104,7 +104,7 @@ const LowerManagerEmployee = () => {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={(e) => { rejectEmp(employee._id); handleSendMail(e); }}
+                                                onClick={() => { rejectEmp(employee._id) }}
                                                 className="flex items-center gap-1 rounded bg-red-500 px-3 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete

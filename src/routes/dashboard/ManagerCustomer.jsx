@@ -34,7 +34,7 @@ const ManagerCustomer = () => {
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            toast.success(response.data.message); // use backend message directly
+            toast.success(response.data.message); 
         } catch (err) {
             const errorMessage = err.response?.data?.message || "Approve failed";
             toast.error(errorMessage);
@@ -60,31 +60,36 @@ const ManagerCustomer = () => {
     const handleSendMail = async (action) => {
     let subject = "";
     let text = "";
- 
+    let to = [];
+
     if (action === "approve") {
+        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
         subject = "Offer Approved";
-        text = "Your offer has been approved.";
+        text = "Your offer has been approved."; 
     } else if (action === "decline") {
+        to = ["shantanu.kr.worldweblogic@gmail.com"];
         subject = "Offer Declined";
         text = "Your offer has been declined.";
     } else if (action === "delete") {
+        to = ["shantanu.kr.worldweblogic@gmail.com"];
         subject = "Offer Deleted";
         text = "Your offer was deleted.";
     }
- 
+
     try {
         const response = await API.post("/send-mail", {
-            to: "skr36880@gmail.com" && "shantanu.kr.worldweblogic@gmail.com", 
+            to,
             subject,
             text,
         });
- 
+
         toast.success(response.data.message);
     } catch (error) {
         console.error("Mail send error:", error);
         toast.error("Failed to send email");
     }
 };
+
 
     return (
         <div className="flex flex-col gap-y-4 p-6 min-h-screen">

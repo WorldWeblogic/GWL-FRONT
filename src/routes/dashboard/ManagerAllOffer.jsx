@@ -116,50 +116,36 @@ const ManagerAllOffers = () => {
     };
 
     const handleSendMail = async (action) => {
-        let subject = "";
-        let text = "";
-        let recipients = [];
-        if (action === "approve") {
-            subject = "Offer Approved";
-            //text = `Hello ${employee.name},\n\nYour offer for position ${employee.position} has been approved.\n\nRegards,\nHR Team`;
-            recipients = ["skr36880@gmail.com", "dipanshupatel857@gmail.com"];
-            text = "approve offer successful";
-        } else if (action === "decline") {
-            subject = "Offer Declined";
-            text = "hskfsklfjslkslksjlksjlskjslfjl";
-            recipients = ["lowermanager@example.com", "customer@example.com"];
-        } else if (action === "delete") {
-            subject = "Offer Deleted";
-            text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj";
-            recipients = ["lowermanager@example.com", "customer@example.com"];
-        } else if (action === "Eapprove") {
-            subject = "Offer Deleted";
-            text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj";
-            recipients = ["lowermanager@example.com", "customer@example.com"];
-        } else if (action === "Edecline") {
-            subject = "Offer Deleted";
-            text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj";
-            recipients = ["lowermanager@example.com", "customer@example.com"];
-        } else if (action === "Edelete") {
-            subject = "Offer Deleted";
-            text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj";
-            recipients = ["lowermanager@example.com", "customer@example.com"];
-        }
-        e.preventDefault();
-        try {
-            for (const to of recipients) {
-                const response = await API.post("/send-mail", {
-                    to,
-                    subject,
-                    text,
-                });
-            }
-            toast.success("Email(s) sent successfully.");;
-        } catch (error) {
-            console.error(error);
-            toast.error(error);
-        }
-    };
+    let subject = "";
+    let text = "";
+    let to = [];
+
+    if (action === "approve") {
+        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Offer Approved";
+        text = "Your offer has been approved."; 
+    } else if (action === "decline") {
+        to = ["shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Offer Declined";
+        text = "Your offer has been declined.";
+    } else if (action === "delete") {
+        to = ["shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Offer Deleted";
+        text = "Your offer was deleted.";
+    }
+    try {
+        const response = await API.post("/send-mail", {
+            to,
+            subject,
+            text,
+        });
+
+        toast.success(response.data.message);
+    } catch (error) {
+        console.error("Mail send error:", error);
+        toast.error("Failed to send email");
+    }
+};
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Customer Offers</h1>
@@ -308,7 +294,7 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 approveemployeeoffer(customer._id);
-                                                handleSendMail("Eapprove");
+                                                handleSendMail("approve");
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                         >
@@ -318,7 +304,7 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 declineemployeeoffer(customer._id);
-                                                handleSendMail("Edecline");
+                                                handleSendMail("decline");
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                         >
@@ -327,7 +313,7 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 softdeleteemloyeeoffer(customer._id);
-                                                handleSendMail("Edelete");
+                                                handleSendMail("delete");
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                                         >
