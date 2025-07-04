@@ -1,0 +1,349 @@
+import { Footer } from "@/layouts/footer";
+import { PencilLine, Trash } from "lucide-react";
+import { useAuth } from "../../contexts/auth";
+import { toast } from "react-toastify";
+import { useState } from "react";
+import API from "../../API/Api";
+import useOfferSync from "../../hooks/useOfferSync";
+
+const ManagerAllOffers = () => {
+    const { offerdata, fetchalloffer, employeeofferdata, fetchallemployeeoffer } = useAuth();
+    const [expandedOffers, setExpandedOffers] = useState({});
+    useOfferSync(fetchalloffer, fetchallemployeeoffer);
+
+    // approve offer
+    const approveoffer = async (id) => {
+        try {
+            const response = await API.put(`/approve-offer/${id}`);
+            // await fetchalloffer();
+            toast.success(response.data.message); // use backend message directly
+            const bc = new BroadcastChannel("offer_status_channel");
+            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
+            bc.close();
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || "Approve failed";
+            toast.error(errorMessage);
+            console.error(err);
+        }
+    };
+    // decline offer
+    const declineoffer = async (id) => {
+        try {
+            const response = await API.put(`/reject-offer/${id}`);
+            // await fetchalloffer();
+            toast.success(response.data.message); // use backend message directly
+            const bc = new BroadcastChannel("offer_status_channel");
+            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
+            bc.close();
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || "reject failed";
+            toast.error(errorMessage);
+            console.error(err);
+        }
+    };
+    const softdeleteoffer = async (id) => {
+        try {
+            await API.patch(
+                `/delete-offer/${id}`,
+                null, // no request body
+            );
+            toast.success("offer deleted Successfully!");
+            // await fetchalloffer();
+            const bc = new BroadcastChannel("offer_status_channel");
+            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
+            bc.close();
+        } catch (err) {
+            const message = err.response?.data?.message || "deletion failed";
+            toast.error(message);
+            console.error("delete error:", err);
+        }
+    };
+    // soft delete employee offer
+    const softdeleteemloyeeoffer = async (id) => {
+        try {
+            await API.patch(
+                `/delete-employee-offer/${id}`,
+                null, // no request body
+            );
+            toast.success("employee offer deleted Successfully!");
+            // await fetchallemployeeoffer();
+            const bc = new BroadcastChannel("offer_status_channel");
+            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
+            bc.close();
+        } catch (err) {
+            const message = "deletion failed";
+            toast.error(message);
+            console.error("delete error:", err);
+        }
+    };
+    // approve employee offer
+    const approveemployeeoffer = async (id) => {
+        try {
+            const response = await API.put(`/approve-employee-offer/${id}`);
+            // await fetchallemployeeoffer();
+            toast.success(response.data.message); // use backend message directly
+            const bc = new BroadcastChannel("offer_status_channel");
+            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
+            bc.close();
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || "Approve failed";
+            toast.error(errorMessage);
+            console.error(err);
+        }
+    };
+    // decline offer
+    const declineemployeeoffer = async (id) => {
+        try {
+            const response = await API.put(`/reject-employee-offer/${id}`);
+            await fetchallemployeeoffer();
+            // toast.success(response.data.message); // use backend message directly
+            const bc = new BroadcastChannel("offer_status_channel");
+            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
+            bc.close();
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || "reject failed";
+            toast.error(errorMessage);
+            console.error(err);
+        }
+    };
+
+    const truncateText = (text, length = 20) => (text.length > length ? text.slice(0, length) + "..." : text);
+    const toggleDescription = (key) => {
+        setExpandedOffers((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+        }));
+    };
+
+    const handleSendMail = async (action) => {
+        let subject = "";
+        let text = "";
+        let recipients = [];
+        if (action === "approve") {
+            subject = "Offer Approved";
+            //text = `Hello ${employee.name},\n\nYour offer for position ${employee.position} has been approved.\n\nRegards,\nHR Team`;
+            recipients = ["skr36880@gmail.com", "dipanshupatel857@gmail.com"];
+            text = "approve offer successful";
+        } else if (action === "decline") {
+            subject = "Offer Declined";
+            text = "hskfsklfjslkslksjlksjlskjslfjl";
+            recipients = ["lowermanager@example.com", "customer@example.com"];
+        } else if (action === "delete") {
+            subject = "Offer Deleted";
+            text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj";
+            recipients = ["lowermanager@example.com", "customer@example.com"];
+        } else if (action === "Eapprove") {
+            subject = "Offer Deleted";
+            text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj";
+            recipients = ["lowermanager@example.com", "customer@example.com"];
+        } else if (action === "Edecline") {
+            subject = "Offer Deleted";
+            text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj";
+            recipients = ["lowermanager@example.com", "customer@example.com"];
+        } else if (action === "Edelete") {
+            subject = "Offer Deleted";
+            text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj";
+            recipients = ["lowermanager@example.com", "customer@example.com"];
+        }
+        e.preventDefault();
+        try {
+            for (const to of recipients) {
+                const response = await API.post("/send-mail", {
+                    to,
+                    subject,
+                    text,
+                });
+            }
+            toast.success("Email(s) sent successfully.");;
+        } catch (error) {
+            console.error(error);
+            toast.error(error);
+        }
+    };
+    return (
+        <div className="flex min-h-screen flex-col gap-y-4 p-6">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Customer Offers</h1>
+            <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900">
+                <div className="mb-4 flex items-start justify-between gap-4 lg:flex-row lg:items-center">
+                    <p className="font-semibold dark:text-white sm:text-sm lg:text-lg">Showing {offerdata.length} Offers </p>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-gray-200 text-sm">
+                        <thead className="bg-gray-100 dark:bg-slate-800 dark:text-white">
+                            <tr>
+                                <th className="px-4 py-2 text-left font-semibold">#</th>
+                                <th className="px-4 py-2 text-left font-semibold">Name</th>
+                                <th className="px-4 py-2 text-left font-semibold">Offer ID</th>
+                                <th className="px-4 py-2 text-left font-semibold">Start Date</th>
+                                <th className="px-4 py-2 text-left font-semibold">End Date</th>
+                                <th className="px-4 py-2 text-left font-semibold">Status</th>
+                                <th className="px-4 py-2 text-left font-semibold">Manager_Name</th>
+                                <th className="px-4 py-2 text-left font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {offerdata.map((customer, index) => (
+                                <tr key={index}>
+                                    <td className="px-4 py-3 dark:text-white">{index + 1}</td>
+                                    <td className="px-4 py-3">
+                                        <div className="flex items-center gap-x-4">
+                                            <div className="flex flex-col gap-y-2">
+                                                <p className="font-medium text-slate-900 dark:text-slate-50">{customer.offerTitle}</p>
+                                                <p className="text-sm text-slate-600 dark:text-slate-400">
+                                                    {expandedOffers[`latest-${customer._id}`]
+                                                        ? customer.offerDescription
+                                                        : truncateText(customer.offerDescription, 20)}
+                                                    {customer.offerDescription.length > 20 && (
+                                                        <button
+                                                            onClick={() => toggleDescription(`latest-${customer._id}`)}
+                                                            className="ml-1 text-xs font-medium text-red-500 hover:underline"
+                                                        >
+                                                            {expandedOffers[`latest-${customer._id}`] ? " Show Less" : " Show More"}
+                                                        </button>
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{customer.offerid}</td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">
+                                        {customer.startDate.slice(0, 10).split("-").reverse().join("-")}
+                                    </td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">
+                                        {customer.endDate.slice(0, 10).split("-").reverse().join("-")}
+                                    </td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{customer.status}</td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{customer.manager}</td>
+                                    <td className="flex gap-2 px-4 py-3">
+                                        <button
+                                            onClick={() => {
+                                                approveoffer(customer._id);
+                                                handleSendMail("approve");
+                                            }}
+                                            className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
+                                        >
+                                            <PencilLine size={16} /> Approve{" "}
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                declineoffer(customer._id);
+                                                handleSendMail("decline");
+                                            }}
+                                            className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
+                                        >
+                                            <Trash size={16} /> Decline
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                softdeleteoffer(customer._id);
+                                                handleSendMail("delete");
+                                            }}
+                                            className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
+                                        >
+                                            <Trash size={16} /> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {/* employee offer */}
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Employee Offers</h1>
+            <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900">
+                <div className="mb-4 flex items-start justify-between gap-4 lg:flex-row lg:items-center">
+                    <p className="font-semibold dark:text-white sm:text-sm lg:text-lg">Showing {employeeofferdata.length} Offers </p>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-gray-200 text-sm">
+                        <thead className="bg-gray-100 dark:bg-slate-800 dark:text-white">
+                            <tr>
+                                <th className="px-4 py-2 text-left font-semibold">#</th>
+                                <th className="px-4 py-2 text-left font-semibold">Name</th>
+                                <th className="px-4 py-2 text-left font-semibold">Offer ID</th>
+                                <th className="px-4 py-2 text-left font-semibold">Start Date</th>
+                                <th className="px-4 py-2 text-left font-semibold">End Date</th>
+                                <th className="px-4 py-2 text-left font-semibold">Status</th>
+                                <th className="px-4 py-2 text-left font-semibold">Manager_Name</th>
+                                <th className="px-4 py-2 text-left font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {employeeofferdata.map((customer, index) => (
+                                <tr key={index}>
+                                    <td className="px-4 py-3 dark:text-white">{index + 1}</td>
+                                    <td className="px-4 py-3">
+                                        <div className="flex items-center gap-x-4">
+                                            <div className="flex flex-col gap-y-2">
+                                                <p className="font-medium text-slate-900 dark:text-slate-50">{customer.offerTitle}</p>
+                                                <p className="text-sm text-slate-600 dark:text-slate-400">
+                                                    {expandedOffers[`latest-${customer._id}`]
+                                                        ? customer.offerDescription
+                                                        : truncateText(customer.offerDescription, 20)}
+                                                    {customer.offerDescription.length > 20 && (
+                                                        <button
+                                                            onClick={() => toggleDescription(`latest-${customer._id}`)}
+                                                            className="ml-1 text-xs font-medium text-red-500 hover:underline"
+                                                        >
+                                                            {expandedOffers[`latest-${customer._id}`] ? " Show Less" : " Show More"}
+                                                        </button>
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{customer.offerid}</td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">
+                                        {customer.startDate.slice(0, 10).split("-").reverse().join("-")}
+                                    </td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">
+                                        {customer.endDate.slice(0, 10).split("-").reverse().join("-")}
+                                    </td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{customer.status}</td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{customer.manager}</td>
+                                    <td className="flex gap-2 px-4 py-3">
+                                        <button
+                                            onClick={() => {
+                                                approveemployeeoffer(customer._id);
+                                                handleSendMail("Eapprove");
+                                            }}
+                                            className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
+                                        >
+                                            <PencilLine size={16} />
+                                            Approve
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                declineemployeeoffer(customer._id);
+                                                handleSendMail("Edecline");
+                                            }}
+                                            className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
+                                        >
+                                            <Trash size={16} /> Decline
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                softdeleteemloyeeoffer(customer._id);
+                                                handleSendMail("Edelete");
+                                            }}
+                                            className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
+                                        >
+                                            <Trash size={16} /> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <Footer />
+        </div>
+    );
+};
+
+export default ManagerAllOffers;
