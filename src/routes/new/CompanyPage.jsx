@@ -89,33 +89,46 @@ const CompanyPage = () => {
         }
     };
 
-    const handleSendMail = async (e) => {
-        e.preventDefault();
-        try {
-            let subject = "";
-            let text = "";
+    const handleSendMail = async (action) => {
+    let subject = "";
+    let text = "";
+    let to = [];
 
-            if (action === "approve") {
-                subject = "Offer Approved";
-                text = "kgskgslghsghslsjlflflfs"
-            } else if (action === "decline") {
-                subject = "Offer Declined";
-                text = "hskfsklfjslkslksjlksjlskjslfjl"
-            } else if (action === "delete") {
-                subject = "Offer Deleted";
-                text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj"
-            }
-            const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject,
-                text,
-            });
-            toast.success(response.data.message);
-        } catch (error) {
-            console.error(error);
-            toast.error(error);
-        }
-    };
+    if (action === "approve") {
+        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Offer Approved";
+        text = "Your offer has been approved."; 
+    } else if (action === "decline") {
+        to = ["shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Offer Declined";
+        text = "Your offer has been declined.";
+    } else if (action === "delete") {
+        to = ["shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Offer Deleted";
+        text = "Your offer was deleted.";
+    } else if (action === "give") {
+        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Points give";
+        text = "Your offer has been approved."; 
+    } else if (action === "redeem") {
+        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Points redeem";
+        text = "Your offer has been approved."; 
+    }
+
+    try {
+        const response = await API.post("/send-mail", {
+            to,
+            subject,
+            text,
+        });
+
+        toast.success(response.data.message);
+    } catch (error) {
+        console.error("Mail send error:", error);
+        toast.error("Failed to send email");
+    }
+};
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
             <div>
@@ -244,14 +257,14 @@ const CompanyPage = () => {
                                         <td className="px-4 py-3 dark:text-white">{data.manager}</td>
                                         <td className="flex gap-2 px-4 py-3">
                                             <button
-                                                onClick={(e) => { handleAction(data._id, true); handleSendMail(e); }}
+                                                onClick={() => { handleAction(data._id, true); handleSendMail("give"); }}
                                                 className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                             >
                                                 <PencilLine size={16} /> Approve
                                             </button>
 
                                             <button
-                                                onClick={(e) => { handleAction(data._id, false); handleSendMail(e); }}
+                                                onClick={() => { handleAction(data._id, false); handleSendMail("redeem"); }}
                                                 className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Decline

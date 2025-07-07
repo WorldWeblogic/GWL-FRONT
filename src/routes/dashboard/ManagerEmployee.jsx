@@ -86,34 +86,45 @@ const ManagerEmployee = () => {
     };
 
     const handleSendMail = async (action) => {
-        e.preventDefault();
-        try {
-            let subject = "";
-            let text = "";
+    let subject = "";
+    let text = "";
+    let to = [];
 
-            if (action === "approve") {
-                subject = "Offer Approved";
-                //text = `Hello ${employee.name},\n\nYour offer for position ${employee.position} has been approved.\n\nRegards,\nHR Team`;
-                text = "kgskgslghsghslsjlflflfs"
-            } else if (action === "decline") {
-                subject = "Offer Declined";
-                text = "hskfsklfjslkslksjlksjlskjslfjl"
-            } else if (action === "delete") {
-                subject = "Offer Deleted";
-                text = "kjkdjslfjsfjsfjslfjslfjslfjsfsjfsj"
-            }
-            const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject,
-                text,
-            });
+    if (action === "approve") {
+        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Employee Approved";
+        text = "Your offer has been approved."; 
+    } else if (action === "decline") {
+        to = ["shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Employee Declined";
+        text = "Your offer has been declined.";
+    } else if (action === "delete") {
+        to = ["shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Employee Deleted";
+        text = "Your offer was deleted.";
+    } else if (action === "give") {
+        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Points give";
+        text = "Your offer has been approved."; 
+    } else if (action === "redeem") {
+        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
+        subject = "Points redeem";
+        text = "Your offer has been approved."; 
+    }
 
-            toast.success(response.data.message);
-        } catch (error) {
-            console.error(error);
-            toast.error(error);
-        }
-    };
+    try {
+        const response = await API.post("/send-mail", {
+            to,
+            subject,
+            text,
+        });
+
+        toast.success(response.data.message);
+    } catch (error) {
+        console.error("Mail send error:", error);
+        toast.error("Failed to send email");
+    }
+};
 
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">

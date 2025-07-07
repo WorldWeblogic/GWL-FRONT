@@ -15,20 +15,20 @@ const LowerManagerCustomer = () => {
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            toast.success(response.data.message); // use backend message directly
+            toast.success(response.data.message); 
+            await handleSendMail();
         } catch (err) {
             const errorMessage = err.response?.data?.message || "reject failed";
             toast.error(errorMessage);
             console.error(err);
         }
     };
-    const handleSendMail = async (e) => {
-        e.preventDefault();
+    const handleSendMail = async () => {
         try {
             const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Offer notification came for Approval",
-                text: "This is a test email sent from MERN app.",
+                to: "shantanu.kr.worldweblogic@gmail.com",
+                subject: "Deleting customer came for Approval",
+                text: "This is a test email sent for offer deleting.",
             });
 
             toast.success(response.data.message);
@@ -87,7 +87,7 @@ const LowerManagerCustomer = () => {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={(e) => { rejectCustomer(customer._id); handleSendMail(e); }}
+                                                onClick={() => { rejectCustomer(customer._id) }}
                                                 className="my-1 flex items-center gap-1 rounded bg-red-500 px-3 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete

@@ -14,15 +14,16 @@ const LowerManagerAllOffers = () => {
     useOfferSync(fetchalloffer, fetchallemployeeoffer);
 
     const deleteoffer = async (id) => {
+       
         try {
             await API.put(
                 `/decline-offer/${id}`  // no request body
             );
             toast.success('offer deleted Successfully!');
-            // await fetchalloffer();
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
+            await handleSendMail();
         } catch (err) {
             const message = err.response?.data?.message || "rejection failed";
             toast.error(message);
@@ -39,10 +40,11 @@ const LowerManagerAllOffers = () => {
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
+            await handleSendMail();
         } catch (err) {
             const message = err.response?.data?.message || "deletion failed";
             toast.error(message);
-            console.error("delete error:", err);
+            console.error( err);
         }
     };
 
@@ -54,13 +56,13 @@ const LowerManagerAllOffers = () => {
         }));
     };
 
-    const handleSendMail = async (e) => {
-        e.preventDefault();
+    const handleSendMail = async () => {
+        
         try {
             const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Offer notification came for Approval",
-                text: "This is a test email sent from MERN app.",
+                to: "shantanu.kr.worldweblogic@gmail.com",
+                subject: "Deleting offer came for Approval",
+                text: "This is a test email sent for offer deleting.",
             });
 
             toast.success(response.data.message);
@@ -124,7 +126,7 @@ const LowerManagerAllOffers = () => {
                                         ><button className="flex items-center gap-1 px-3 py-1 my-3 bg-blue-500 text-white rounded">
                                                 <PencilLine size={16} /> Manage
                                             </button></Link>
-                                        <button onClick={(e) => { deleteoffer(customer._id) }}
+                                        <button onClick={() => { deleteoffer(customer._id) }}
                                             className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">
                                             <Trash size={16} /> Delete
                                         </button>
@@ -188,7 +190,7 @@ const LowerManagerAllOffers = () => {
                                         ><button className="flex items-center gap-1 px-3 py-1 my-3 bg-blue-500 text-white rounded">
                                                 <PencilLine size={16} /> Manage
                                             </button></Link>
-                                        <button onClick={(e) => { softdeleteemloyeeoffer(customer._id); handleSendMail(e); }}
+                                        <button onClick={() => { softdeleteemloyeeoffer(customer._id)}}
                                             className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">
                                             <Trash size={16} /> Delete
                                         </button>

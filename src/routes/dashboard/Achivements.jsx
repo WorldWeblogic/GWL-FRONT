@@ -89,7 +89,7 @@ export default function Achivements() {
       <section className="mb-12">
         <h2 className="text-2xl font-semibold mb-6 dark:text-white">Milestone Rewards</h2>
         <div className="dark:bg-slate-950 bg-white shadow mb-4 rounded-lg py-4 px-6 flex items-center hover:shadow-red-500 hover:scale-105 hover:cursor-pointer">
-          <span><FaStar className="text-green-500 mr-4" size={32} /></span>
+          <span><FaStar className="text-red-500 mr-4" size={32} /></span>
           <span className="font-semibold dark:text-white">Green color means you did not achieve any milestone Rewards or your milestone Rewards are less than 300 points.</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

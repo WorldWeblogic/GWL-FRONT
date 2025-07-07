@@ -19,9 +19,10 @@ const LowerManagerAllupcomingoffer = () => {
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            toast.success(response.data.message); // use backend message directly
+            toast.success("Delete request of customer upcoming offer send to super manager successfully");
+            await handleSendMail(); 
         } catch (err) {
-            const errorMessage = err.response?.data?.message || "reject failed";
+            const errorMessage = err.response?.data?.message || "delete failed";
             toast.error(errorMessage);
             console.error(err);
         }
@@ -33,7 +34,8 @@ const LowerManagerAllupcomingoffer = () => {
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            toast.success(response.data.message); // use backend message directly
+            toast.success("Delete request of employee upcoming offer send to super manager successfully"); 
+            await handleSendMail();
         } catch (err) {
             const errorMessage = err.response?.data?.message || "reject failed";
             toast.error(errorMessage);
@@ -49,13 +51,12 @@ const LowerManagerAllupcomingoffer = () => {
         }));
     };
 
-    const handleSendMail = async (e) => {
-        e.preventDefault();
+    const handleSendMail = async () => {
         try {
             const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Offer notification came for Approval",
-                text: "This is a test email sent from MERN app.",
+                to: "shantanu.kr.worldweblogic@gmail.com",
+                subject: "Deleting upcoming offer came for Approval",
+                text: "This is a test email sent for offer deleting.",
             });
 
             toast.success(response.data.message);
@@ -118,7 +119,7 @@ const LowerManagerAllupcomingoffer = () => {
                                         ><button className="flex items-center gap-1 px-3 py-1 my-3 bg-blue-500 text-white rounded">
                                                 <PencilLine size={16} /> Manage
                                             </button></Link>
-                                        <button onClick={(e) => { deleteoffer(customer._id); handleSendMail(e) }}
+                                        <button onClick={() => { deleteoffer(customer._id)}}
                                             className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">
                                             <Trash size={16} /> Delete
                                         </button>
@@ -181,7 +182,7 @@ const LowerManagerAllupcomingoffer = () => {
                                         ><button className="flex items-center gap-1 px-3 py-1 my-3 bg-blue-500 text-white rounded justify-center text-center">
                                                 <PencilLine size={16} /> Manage
                                             </button></Link>
-                                        <button onClick={(e) => { deleteemployeeoffer(customer._id); handleSendMail(e) }} className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">
+                                        <button onClick={() => { deleteemployeeoffer(customer._id)}} className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">
                                             <Trash size={16} /> Delete
                                         </button>
                                     </td>

@@ -66,6 +66,7 @@ const AddEmployeeOffers = () => {
             });
             await fetchallemployeeoffer();
             toast.success("Adding employee offer notification send for approval send to super manager!");
+            await handleSendMail();
         } catch (err) {
             const message = "offer created failed";
             toast.error(message);
@@ -186,7 +187,7 @@ const AddEmployeeOffers = () => {
                     <div className="mt-6">
                         <button
                             type="submit"
-                            onClick={(e) => { employeehandlesubmit(e); handleSendMail(e); }}
+                            onClick={(e) => { employeehandlesubmit(e)}}
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                         >
                             Submit

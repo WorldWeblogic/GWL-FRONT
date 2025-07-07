@@ -106,6 +106,7 @@ const UpdateEmployee = () => {
                 }
             );
             toast.success('Request sent for admin approval');
+            await handleSendMail(e);
         }
         catch (err) {
             toast.error(err.response.data.message);
@@ -136,7 +137,6 @@ const UpdateEmployee = () => {
                 subject: "Offer notification came for Approval",
                 text: "This is a test email sent from MERN app.",
             });
-
             toast.success(response.data.message);
         } catch (error) {
             console.error("Error sending mail:", error);
@@ -430,7 +430,7 @@ const UpdateEmployee = () => {
 
                             <div className="mt-6">
                                 <button
-                                    onClick={(e) => { handleSubmit(e); handleSendMail(e); }}
+                                    onClick={(e) => { handleSubmit(e) }}
                                     className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                                 >
                                     Submit

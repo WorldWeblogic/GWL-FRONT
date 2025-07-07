@@ -112,7 +112,7 @@ const DashboardPage = () => {
                                 </defs>
                                 <Tooltip
                                     cursor={false}
-                                    formatter={(value) => `$${value}`}
+                                    formatter={(value) => `${value}`}
                                 />
                                 <XAxis
                                     dataKey="name"
@@ -124,7 +124,7 @@ const DashboardPage = () => {
                                     dataKey="total"
                                     strokeWidth={0}
                                     stroke={theme === "light" ? "#475569" : "#94a3b8"}
-                                    tickFormatter={(value) => `$${value}`}
+                                    tickFormatter={(value) => `${value}`}
                                     tickMargin={6}
                                 />
                                 <Area
