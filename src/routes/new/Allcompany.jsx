@@ -2,9 +2,12 @@ import { Footer } from "@/layouts/footer";
 import { useAuth } from "../../contexts/auth";
 import { Link } from "react-router-dom";
 import { PencilLine } from "lucide-react";
+import { useState } from "react";
+import { BASE_URL } from "../../API/Api";
 
 const Allcompany = () => {
     const { companydata } = useAuth();
+    const [showPdfUrl, setShowPdfUrl] = useState(null);
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
             <div>
@@ -27,6 +30,8 @@ const Allcompany = () => {
                                     <th className="px-4 py-2 text-left font-semibold">Customers_Id</th>
                                     <th className="px-4 py-2 text-left font-semibold">Points</th>
                                     <th className="px-4 py-2 text-left font-semibold">Status</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Company Certificate</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Emirates ID</th>
                                     <th className="px-4 py-2 text-left font-semibold">Manager_Name</th>
                                     <th className="px-4 py-2 text-left font-semibold">Actions</th>
                                 </tr>
@@ -54,6 +59,20 @@ const Allcompany = () => {
                                         </td>
                                         <td className="px-4 py-3 dark:text-white">{company.points}</td>
                                         <td className="px-4 py-3 dark:text-white">{company.status}</td>
+                                        {/* SHOW PDF BUTTON */}
+                                        <td className="px-4 py-3 dark:text-white">
+                                            {company.pdf1Path ? (
+                                                <button target="_blank"
+                                                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                                                    onClick={() => setShowPdfUrl(`${BASE_URL}${company.pdf1Path}`)}
+                                                >
+                                                    Show PDF
+                                                </button>
+                                            ) : (
+                                                <span className="text-gray-400">No File</span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-3 dark:text-white">{company.emetID}</td>
                                         <td className="px-4 py-3 dark:text-white">{company.manager}</td>
                                         <td className="flex gap-2 px-4 py-3">
                                             <Link
@@ -72,6 +91,29 @@ const Allcompany = () => {
                     </div>
                 </div>
             </div>
+
+            {/* PDF Modal Viewer */}
+            {showPdfUrl && (
+                <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-11/12 max-w-3xl p-4 relative">
+                        <button
+                            className="absolute top-2 right-2 text-red-600 font-bold text-xl"
+                            onClick={() => setShowPdfUrl(null)}
+                        >
+                            ✖
+                        </button>
+                        <h2 className="text-lg font-semibold mb-4 dark:text-white">PDF Preview</h2>
+                        <iframe
+                            src={showPdfUrl}
+                            title="PDF Viewer"
+                            width="100%"
+                            height="500px"
+                            className="border rounded"
+                        ></iframe>
+                    </div>
+                </div>
+            )}
+
             <Footer />
         </div>
     );

@@ -99,6 +99,8 @@ const AllOffers = () => {
                                             </div>
                                         </div>
                                     </td>
+
+
                                     <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">{data.offerid}</td>
                                     <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-50">
                                         {data.startDate.slice(0, 10).split("-").reverse().join("-")}

@@ -7,7 +7,7 @@ import API from "../../API/Api";
 const AddCompany = () => {
     const { fetchallcompany, lowermanager } = useAuth();
     const phone = useRef();
-
+    const [emiratesId, setEmiratesId] = useState("");
     const [data, setData] = useState({
         name: "",
         companyId: "",
@@ -17,8 +17,8 @@ const AddCompany = () => {
         employeeid: "",
     });
 
+
     const [pdf1, setPdf1] = useState(null);
-    const [pdf2, setPdf2] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -46,10 +46,6 @@ const AddCompany = () => {
         }
     };
 
-    useEffect(() => {
-        getComId();
-    }, []);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -62,7 +58,7 @@ const AddCompany = () => {
             formData.append(key, value);
         });
         formData.append("pdf1", pdf1);
-        formData.append("pdf2", pdf2);
+        formData.append("emetID", emiratesId);
 
         formData.append(
             "manager",
@@ -88,8 +84,8 @@ const AddCompany = () => {
                 employeeid: "",
             });
             setPdf1(null);
-            setPdf2(null);
             getComId();
+            getEmiratesID();
             await handleSendMail(e);
         } catch (err) {
             toast.error(err.response?.data?.message || "Error occurred");
@@ -111,6 +107,18 @@ const AddCompany = () => {
             toast.error(error);
         }
     };
+
+    const getEmiratesID = async () => {
+        const response = await API.get("/getEId");
+        setEmiratesId(response.data.emetID);
+    }
+
+    useEffect(() => {
+        getComId();
+        getEmiratesID();
+    }, []);
+
+
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Add Company</h1>
@@ -184,15 +192,18 @@ const AddCompany = () => {
                                 className="w-full rounded border px-3 py-2 text-black shadow"
                             />
                         </div>
-                        <div className="flex flex-col">
-                            <label className="mb-1 dark:text-white">Upload Licence</label>
-                            <input
-                                type="file"
-                                accept="application/pdf"
-                                onChange={(e) => setPdf2(e.target.files[0])}
-                                className="w-full rounded border px-3 py-2 text-black shadow"
-                            />
-                        </div>
+                    </div>
+
+                    <div className="flex flex-col">
+                        <label className="mb-1 dark:text-white">Emirates ID</label>
+                        <input
+                            type="id"
+                            name="id"
+                            value={emiratesId}
+                            onChange={handleChange}
+                            readOnly
+                            className="w-full rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:outline-none"
+                        />
                     </div>
 
                     <div className="flex flex-col mt-4">
