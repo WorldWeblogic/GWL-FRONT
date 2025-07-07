@@ -25,6 +25,9 @@ const ManagerEmployee = () => {
             console.error("delete error:", err);
         }
     };
+
+    console.log(employeedata);
+
     // approve employee
     const approveEmployee = async (id) => {
         try {

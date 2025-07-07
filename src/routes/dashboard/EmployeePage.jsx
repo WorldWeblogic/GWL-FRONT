@@ -8,7 +8,6 @@ import { useAuth } from "../../contexts/auth";
 import { useEffect, useState } from "react";
 import API from "../../API/Api";
 import { toast } from "react-toastify";
-import Leaderboard from "./Leaderboard";
 
 const EmployeePage = () => {
     const { theme } = useTheme();
