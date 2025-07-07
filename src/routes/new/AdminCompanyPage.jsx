@@ -47,14 +47,14 @@ const AdminCompanyPage = () => {
                                     <th className="px-4 py-2 text-left font-semibold">#</th>
                                     <th className="px-4 py-2 text-left font-semibold">Company Name</th>
                                     <th className="px-4 py-2 text-left font-semibold">Company_Id</th>
-                                    <th className="px-4 py-2 text-left font-semibold">email</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Email</th>
                                     <th className="px-4 py-2 text-left font-semibold">Phone</th>
                                     <th className="px-4 py-2 text-left font-semibold">Address</th>
                                     <th className="px-4 py-2 text-left font-semibold">Status</th>
                                     <th className="px-4 py-2 text-left font-semibold">Customers</th>
                                     <th className="px-4 py-2 text-left font-semibold">Customers_Id</th>
                                     <th className="px-4 py-2 text-left font-semibold">Company Cretificate</th>
-                                    <th className="px-4 py-2 text-left font-semibold">Company Licence</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Emirates ID</th>
                                     <th className="px-4 py-2 text-left font-semibold">Actions</th>
                                 </tr>
                             </thead>
@@ -93,18 +93,7 @@ const AdminCompanyPage = () => {
                                             )}
                                         </td>
 
-                                        <td className="px-4 py-3 dark:text-white">
-                                            {company.pdf2Path ? (
-                                                <button
-                                                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
-                                                    onClick={() => setShowPdfUrl(`${BASE_URL}${company.pdf2Path}`)}
-                                                >
-                                                    Show PDF
-                                                </button>
-                                            ) : (
-                                                <span className="text-gray-400">No File</span>
-                                            )}
-                                        </td>
+                                        <td className="px-4 py-3 dark:text-white">{company.emetID}</td>
 
                                         <td className="px-4 py-3 flex gap-2">
                                             <Link to={"/layout/update-company"}
@@ -147,8 +136,6 @@ const AdminCompanyPage = () => {
                     </div>
                 </div>
             )}
-
-
             <Footer />
         </div>
     );

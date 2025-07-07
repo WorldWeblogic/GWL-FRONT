@@ -27,6 +27,7 @@ const AddemployeePage = () => {
             [name]: value,
         }));
     };
+
     const handlesubmit = async (e) => {
         e.preventDefault();
         try {
@@ -38,6 +39,7 @@ const AddemployeePage = () => {
                         lowermanager && lowermanager.firstname && lowermanager.lastname
                             ? `${lowermanager.firstname} ${lowermanager.lastname}`
                             : "Created by Super Manager / Admin",
+                    managerEmail: lowermanager.email
                 },
                 {
                     headers: {
@@ -194,7 +196,7 @@ const AddemployeePage = () => {
                     <div className="mt-6">
                         <button
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
-                            onClick={(e) => { handlesubmit(e)}}
+                            onClick={(e) => { handlesubmit(e) }}
                         >
                             Submit
                         </button>

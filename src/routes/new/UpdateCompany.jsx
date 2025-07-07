@@ -12,7 +12,6 @@ const UpdateCompany = () => {
     const [value, setValue] = useState('');
     const [notification, setnotification] = useState("");
     const [pdf1, setPdf1] = useState(null);
-    const [pdf2, setPdf2] = useState(null);
 
     const [data, setData] = useState({
         name: "",
@@ -20,7 +19,8 @@ const UpdateCompany = () => {
         phone: "",
         email: "",
         companyaddress: "",
-        employeeid: ""
+        employeeid: "",
+        emiratesId: ""
     });
 
     const location = useLocation();
@@ -35,42 +35,6 @@ const UpdateCompany = () => {
     };
 
 
-    // const handleUpdateCompany = async (e) => {
-    //     e.preventDefault();
-    //     const updatedData = {
-    //         name: data.name,
-    //         companyId: data.companyId,
-    //         email: data.email,
-    //         phone: data.phone,
-    //         employeeid: data.employeeid,
-    //         companyaddress: data.companyaddress
-    //     };
-
-    //     try {
-    //         await API.put(`/updatecompany/${data.companyId}`, updatedData, {
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             withCredentials: true,
-    //         });
-    //         setData({
-    //             name: "",
-    //             companyId: "",
-    //             email: "",
-    //             phone: "",
-    //             employeeid: "",
-    //             companyaddress: ""
-    //         })
-    //         toast.success('Successfully updated!')
-    //         await fetchallcompany();
-    //     } catch (err) {
-    //         const message = "updation failed";
-    //         toast.error(message);
-    //         console.error("update error:", err);
-    //     }
-    // };
-
-
     const handleUpdateCompany = async (e) => {
         e.preventDefault();
 
@@ -81,9 +45,9 @@ const UpdateCompany = () => {
         formData.append("phone", data.phone);
         formData.append("employeeid", data.employeeid);
         formData.append("companyaddress", data.companyaddress);
+        formData.append("emiratesId", data.emiratesId);
 
         if (pdf1) formData.append("pdf1", pdf1);
-        if (pdf2) formData.append("pdf2", pdf2);
 
         try {
             await API.put(`/updatecompany/${data.companyId}`, formData, {
@@ -98,7 +62,6 @@ const UpdateCompany = () => {
 
             // Reset
             setPdf1(null);
-            setPdf2(null);
             setData({
                 name: "",
                 companyId: "",
@@ -107,6 +70,8 @@ const UpdateCompany = () => {
                 employeeid: "",
                 companyaddress: ""
             });
+
+            //getemiratedId Api
 
         } catch (err) {
             toast.error("Update failed");
@@ -118,13 +83,14 @@ const UpdateCompany = () => {
 
     const getCompany = async () => {
         try {
-            const res = await API.get(`/getCompany/${LManagerCustId}`)
+            const res = await API.get(`/getCompany/${LManagerCustId}`);
             setData({
                 name: res.data.compData.name,
                 companyId: res.data.compData.companyId,
                 email: res.data.compData.email,
                 phone: res.data.compData.phone,
                 companyaddress: res.data.compData.companyaddress,
+                emiratesId: res.data.compData.emetID
             })
 
         } catch (err) {
@@ -263,13 +229,18 @@ const UpdateCompany = () => {
                                         className="w-full appearance-none rounded border px-3 py-2 text-black shadow dark:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500 bg-white"
                                     />
                                 </div>
+
                                 <div className="flex flex-col">
-                                    <label className="mb-1 dark:text-white">Upload Licence</label>
+                                    <label className="mb-1 dark:text-white">Emirates ID</label>
                                     <input
-                                        type="file"
-                                        accept="application/pdf"
-                                        onChange={(e) => setPdf2(e.target.files[0])}
-                                        className="w-full appearance-none rounded border px-3 py-2 text-black shadow dark:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500 bg-white"
+                                        type="text"
+                                        placeholder="Emirates Id"
+                                        value={data.emiratesId}
+                                        onChange={handleChange}
+                                        name="emiratesId"
+                                        id="emiratesId"
+                                        readOnly
+                                        className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                                     />
                                 </div>
 

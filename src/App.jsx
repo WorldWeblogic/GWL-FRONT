@@ -296,7 +296,8 @@ function App() {
                     path: "/LowerManagerlayout/edit-company", element: (
                         <LManagerRoute>
                             <LowerManagerCompanyPage />
-                        </LManagerRoute>)
+                        </LManagerRoute>
+                    )
                 },
                 {
                     path: "/LowerManagerlayout/add-company", element: (
