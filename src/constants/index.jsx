@@ -514,7 +514,7 @@ export const lowermanagernavbarLinks = [
 export const overviewData = [
     {
         name: "Jan",
-        total: 1500,
+        total: 1000,
     },
     {
         name: "Feb",

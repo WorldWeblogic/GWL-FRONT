@@ -102,13 +102,13 @@ const EmployeePage = () => {
     function getRankColorClass(rank) {
         switch (rank) {
             case 1:
-                return "bg-red-600 dark:bg-red-600";
+                return "bg-red-600 dark:bg-red-600 dark:text-white text-black";
             case 2:
-                return "bg-blue-600 dark:bg-blue-600";
+                return "bg-blue-600 dark:bg-blue-600 dark:text-white text-black";
             case 3:
-                return "bg-green-600 dark:bg-green-600";
+                return "bg-green-600 dark:bg-green-600 dark:text-white text-black";
             default:
-                return "bg-zinc-500";
+                return "dark:text-white text-black";
         }
     }
 
@@ -202,7 +202,7 @@ const EmployeePage = () => {
                             {leader.map((emp, index) => (
                                 <tr
                                     key={index}
-                                    className={`${getRankColorClass(index + 1)}rounded-lg shadow-sm text-white`}
+                                    className={`${getRankColorClass(index + 1)}rounded-lg shadow-sm`}
                                 >
                                     <td className="rounded-l-lg px-4 py-2">{index + 1}</td>
                                     <td className="px-4 py-2">
@@ -216,73 +216,71 @@ const EmployeePage = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
-                {/* Latest Offers */}
-                <div className="card">
-                    <div className="card-header">
-                        <span>
-                            <Package
-                                size={26}
-                                className="text-blue-500"
-                            />
-                        </span>
-                        <p className="card-title">Latest Offers</p>
-                    </div>
-                    <div className="card-body h-[300px] overflow-auto p-0">
-                        {offerdata.map((sale) => (
-                            <div
-                                key={sale._id}
-                                className="flex flex-col gap-y-2 border-b border-slate-200 p-3 dark:border-slate-700"
-                            >
-                                <p className="font-medium text-slate-900 dark:text-slate-50">{sale.offerTitle}</p>
-                                <p className="text-sm text-slate-600 dark:text-slate-400">
-                                    {expandedOffers[`latest-${sale._id}`] ? sale.offerDescription : truncateText(sale.offerDescription, 50)}
-                                    {sale.offerDescription?.length > 50 && (
-                                        <button
-                                            onClick={() => toggleDescription(`latest-${sale._id}`)}
-                                            className="ml-1 text-xs font-medium text-red-500 hover:underline"
-                                        >
-                                            {expandedOffers[`latest-${sale._id}`] ? " Show Less" : " Show More"}
-                                        </button>
-                                    )}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+             <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900">
+                <div className="mb-4 flex items-start justify-between gap-4 lg:flex-row lg:items-center">
+                    <p className="font-semibold dark:text-white sm:text-sm lg:text-lg">Showing {offerdata.length} Offers</p>
                 </div>
+                <div className="w-full overflow-x-auto scroll-smooth">
+                    <table className="min-w-[1000px] table-auto divide-gray-200 text-sm">
+                        <thead className="bg-gray-100 dark:bg-slate-800 dark:text-white">
+                            <tr>
+                                <th className="w-12 px-4 py-2 text-left font-semibold">#</th>
+                                <th className="w-60 px-4 py-2 text-left font-semibold">Title</th>
+                                <th className="w-80 px-4 py-2 text-left font-semibold">Description</th>
+                                <th className="w-40 px-4 py-2 text-left font-semibold">Offer Valid Date</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {offerdata.map((data, index) => (
+                                <tr key={index}>
+                                    <td className="px-4 py-3 dark:text-white">{index + 1}</td>
+                                    <td className="px-4 py-3 dark:text-white">{data.offerTitle}</td>
+                                    <td className="px-4 py-3 dark:text-white">{data.offerDescription}</td>
+                                    <td className="px-4 py-3 dark:text-white">
+                                    {new Date(data.endDate).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                    })}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                {/* Upcoming Offers */}
-                <div className="card">
-                    <div className="card-header">
-                        <span>
-                            <Package
-                                size={26}
-                                className="text-blue-500"
-                            />
-                        </span>
-                        <p className="card-title">Upcoming Offers</p>
-                    </div>
-                    <div className="card-body h-[300px] overflow-auto p-0">
-                        {upcomingofferdata.map((sale, index) => (
-                            <div
-                                key={index}
-                                className="flex flex-col gap-y-2 border-b border-slate-200 p-3 dark:border-slate-700"
-                            >
-                                <p className="font-medium text-slate-900 dark:text-slate-50">{sale.offerTitle}</p>
-                                <p className="text-sm text-slate-600 dark:text-slate-400">
-                                    {expandedOffers[`latest-${sale._id}`] ? sale.offerDescription : truncateText(sale.offerDescription, 50)}
-                                    {sale.offerDescription?.length > 50 && (
-                                        <button
-                                            onClick={() => toggleDescription(`latest-${sale._id}`)}
-                                            className="ml-1 text-xs font-medium text-red-500 hover:underline"
-                                        >
-                                            {expandedOffers[`latest-${sale._id}`] ? " Show Less" : " Show More"}
-                                        </button>
-                                    )}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+            
+            <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900">
+                <div className="mb-4 flex items-start justify-between gap-4 lg:flex-row lg:items-center">
+                    <p className="font-semibold dark:text-white sm:text-sm lg:text-lg">Showing {upcomingofferdata.length} Upcoming Offers</p>
+                </div>
+                <div className="w-full overflow-x-auto scroll-smooth">
+                    <table className="min-w-[1000px] table-auto divide-gray-200 text-sm">
+                        <thead className="bg-gray-100 dark:bg-slate-800 dark:text-white">
+                            <tr>
+                                <th className="w-12 px-4 py-2 text-left font-semibold">#</th>
+                                <th className="w-60 px-4 py-2 text-left font-semibold">Title</th>
+                                <th className="w-80 px-4 py-2 text-left font-semibold">Description</th>
+                                <th className="w-40 px-4 py-2 text-left font-semibold">Offer Valid Date</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {upcomingofferdata.map((data, index) => (
+                                <tr key={index}>
+                                    <td className="px-4 py-3 dark:text-white">{index + 1}</td>
+                                    <td className="px-4 py-3 dark:text-white">{data.offerTitle}</td>
+                                    <td className="px-4 py-3 dark:text-white">{data.offerDescription}</td>
+                                    <td className="px-4 py-3 dark:text-white">
+                                    {new Date(data.endDate).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                    })}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

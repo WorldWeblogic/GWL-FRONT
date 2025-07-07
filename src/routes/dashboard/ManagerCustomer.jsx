@@ -143,6 +143,7 @@ const ManagerCustomer = () => {
                         </table>
                     </div>
                 </div>
+                
             </div>
             <Footer />
         </div>
