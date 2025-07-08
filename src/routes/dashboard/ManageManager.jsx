@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Footer } from "@/layouts/footer";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,13 +6,18 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const ManageManager = () => {
-    const [manager, setManager] = useState({ firstname: "", lastname: "", email: "" })
+    const [manager, setManager] = useState({ firstname: "", lastname: "", password: "",phone:"" })
     const location = useLocation();
     const { managerId, manager_type } = location.state;
     const { fetchlowermanagerData } = useAuth();
     const { fetchmanagerData } = useAuth();
-
-
+    
+   const phone = useRef();
+       function handlenumber(e) {
+           // Remove all characters except digits and dashes
+           const sanitized = e.target.value.replace(/[^0-9-]/g, "");
+           phone.current.value = sanitized;
+       }
 
     const handleUpdateManager = async (e) => {
         e.preventDefault();
@@ -20,7 +25,8 @@ const ManageManager = () => {
         const updatedData = {
             firstname: manager.firstname,
             lastname: manager.lastname,
-            email: manager.email,
+            password: manager.password,
+            phone:manager.phone,
         };
 
         try {
@@ -41,7 +47,8 @@ const ManageManager = () => {
             setManager({
                 firstname: "",
                 lastname: "",
-                email: "",
+                password: "",
+                phone:""
             });
             toast.success("Successfully updated!");
         } catch (err) {
@@ -61,7 +68,7 @@ const ManageManager = () => {
             setManager({
                 firstname: response.data.managerdata.firstname,
                 lastname: response.data.managerdata.lastname,
-                email: response.data.managerdata.email
+                phone:response.data.managerdata.phone
             })
         } catch (err) {
             console.log(`Error Fetching LowerManager Data: ${err}`);
@@ -87,7 +94,7 @@ const ManageManager = () => {
                                 placeholder="Name"
                                 value={manager.firstname}
                                 onChange={(e) => setManager({ ...manager, firstname: e.target.value })}
-                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-300"
+                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                             />
                         </div>
 
@@ -98,18 +105,36 @@ const ManageManager = () => {
                                 placeholder="Last Name"
                                 value={manager.lastname}
                                 onChange={(e) => setManager({ ...manager, lastname: e.target.value })}
-                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-300"
+                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                             />
                         </div>
 
                         <div className="flex flex-col">
-                            <label className="mb-1 dark:text-white">Email</label>
+                            <label className="mb-1 dark:text-white">password</label>
                             <input
-                                type="email"
-                                placeholder="Email"
-                                value={manager.email}
-                                onChange={(e) => setManager({ ...manager, email: e.target.value })}
-                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-300"
+                                type="text"
+                                placeholder="password"
+                                value={manager.password}
+                                onChange={(e) => setManager({ ...manager, password: e.target.value })}
+                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
+                            />
+                        </div>
+
+                        <div className="flex flex-col">
+                            <label className="mb-1 dark:text-white">Phone</label>
+                            <input
+                                type="tel"
+                                placeholder="Phone"
+                                pattern="\d{3}-\d{2}-\d{3}"
+                                ref={phone}
+                                id="phone"
+                                name="phone"
+                                value={manager.phone}
+                                onChange={(e) => {
+                                    handlenumber(e);
+                                    setManager({ ...manager, phone: e.target.value })
+                                }}
+                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                             />
                         </div>
                     </div>

@@ -15,7 +15,7 @@ const ManageEmployee = () => {
         phone.current.value = sanitized;
     }
     const [data, setdata] = useState({
-        email: "",
+        password: "",
         firstname: "",
         lastname: "",
         phone: "",
@@ -35,7 +35,7 @@ const ManageEmployee = () => {
     const handlesubmit = async (e) => {
         e.preventDefault();
         const updateData = {
-            email: data.email,
+            password: data.password,
             firstname: data.firstname,
             lastname: data.lastname,
             phone: data.phone,
@@ -48,7 +48,6 @@ const ManageEmployee = () => {
                 withCredentials: true,
             });
             setdata({
-                email: "",
                 password: "",
                 firstname: "",
                 lastname: "",
@@ -71,7 +70,6 @@ const ManageEmployee = () => {
             setdata({
                 firstname: response.data.employeedata.firstname,
                 lastname: response.data.employeedata.lastname,
-                email: response.data.employeedata.email,
                 phone: response.data.employeedata.phone
             })
         } catch (error) {
@@ -99,7 +97,7 @@ const ManageEmployee = () => {
                                 id="firstname"
                                 value={data.firstname}
                                 onChange={handleChange}
-                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:outline-red-500"
+                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                             />
                         </div>
 
@@ -112,21 +110,21 @@ const ManageEmployee = () => {
                                 id="lastname"
                                 value={data.lastname}
                                 onChange={handleChange}
-                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:outline-red-500"
+                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                             />
                         </div>
 
-                        {/* Email and Password */}
+                        {/* password and Password */}
                         <div className="flex flex-col">
-                            <label className="mb-1 dark:text-white">Email ID</label>
+                            <label className="mb-1 dark:text-white">Password </label>
                             <input
-                                type="email"
-                                placeholder="Email ID"
-                                name="email"
-                                id="email"
-                                value={data.email}
+                                type="text"
+                                placeholder="password "
+                                name="password"
+                                id="password"
+                                value={data.password}
                                 onChange={handleChange}
-                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:outline-red-500"
+                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                             />
                         </div>
 
@@ -144,7 +142,7 @@ const ManageEmployee = () => {
                                     handlenumber(e);
                                     handleChange(e);
                                 }}
-                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:outline-red-500"
+                                className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                             />
                         </div>
                     </div>
