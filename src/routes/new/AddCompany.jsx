@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const AddCompany = () => {
-    const { fetchallcompany, lowermanager } = useAuth();
+    const { fetchallcompany, lowermanager, managerdata } = useAuth();
     const phone = useRef();
     const [emiratesId, setEmiratesId] = useState("");
     const [data, setData] = useState({
@@ -46,7 +46,7 @@ const AddCompany = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e, company, superManagerEmail, lowermanagerFirstName, lowermanagerLastName) => {
         e.preventDefault();
 
         if (!data.name || !data.email || !data.phone || !data.companyaddress || !data.employeeid) {
@@ -86,19 +86,19 @@ const AddCompany = () => {
             setPdf1(null);
             getComId();
             getEmiratesID();
-            await handleSendMail(e);
+            await handleSendMail(e, company, superManagerEmail, lowermanagerFirstName, lowermanagerLastName);
         } catch (err) {
             toast.error(err.response?.data?.message || "Error occurred");
         }
     };
 
-    const handleSendMail = async (e) => {
+    const handleSendMail = async (e, company, superManagerEmail, lowermanagerFirstName, lowermanagerLastName) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
-                to: "shantanu.kr.worldweblogic@gmail.com",
-                subject: "Adding company notification came for Approval",
-                text: "This is a test email sent for company adding.",
+                to: [superManagerEmail],
+                subject: "Action Required: Please Review New Company Add Request",
+                html: generateHtmlTemplate(company, lowermanagerFirstName, lowermanagerLastName)
             });
 
             toast.success(response.data.message);
@@ -113,10 +113,70 @@ const AddCompany = () => {
         setEmiratesId(response.data.emetID);
     }
 
+    const generateHtmlTemplate = (company, lowerManagerFirstName, lowerManagerLastName) => {
+        return `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px 0;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Company Action Required</h2>
+      </div>
+      <div class="content">
+        <p>Dear Super Manager,</p>
+        <p>
+          A new Company has been added by 
+          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+        </p>
+        <p><strong>Company Name:</strong> ${company.name}</p>
+        <p><strong>Company Email:</strong>${company.email}</p>
+
+        <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
+      </div>
+    </div>
+  </body>
+</html>
+  `;
+    };
+
     useEffect(() => {
         getComId();
         getEmiratesID();
     }, []);
+
 
 
     return (
@@ -220,7 +280,7 @@ const AddCompany = () => {
 
                     <div className="mt-6">
                         <button
-                            onClick={(e) => { handleSubmit(e) }}
+                            onClick={(e) => { handleSubmit(e, data, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname) }}
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                         >
                             Submit

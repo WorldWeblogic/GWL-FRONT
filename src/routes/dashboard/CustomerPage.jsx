@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import API from "../../API/Api";
-import Popup from "./Popup";
 import { toast } from "react-toastify";
 
 const MySwal = withReactContent(Swal);
@@ -79,10 +78,10 @@ const CustomerPage = () => {
     }, []);
 
     const [showModal, setShowModal] = useState(false);
-    const [message,setmessage]=useState("")
+    const [message, setmessage] = useState("")
     const openModal = () => setShowModal(true);
     const closeModal = () => setShowModal(false);
-    const [value,setvalue]=useState(0);
+    const [value, setvalue] = useState(0);
     const handleSendMail = async () => {
         try {
             const response = await API.post("/send-mail", {
@@ -158,14 +157,14 @@ const CustomerPage = () => {
                                     type="Number"
                                     placeholder="Enter Points"
                                     value={value}
-                                    onChange={(e)=>setvalue(e.target.value)}
+                                    onChange={(e) => setvalue(e.target.value)}
                                     className="w-full rounded-lg p-2 focus:outline-none border focus:border-red-500 focus:bg-slate-50"
                                 />
                                 <textarea
                                     type="text"
                                     rows={3}
                                     value={message}
-                                    onChange={(e)=>setmessage(e.target.value)}
+                                    onChange={(e) => setmessage(e.target.value)}
                                     placeholder="message"
                                     className="w-full mt-2 rounded-lg focus:outline-none border focus:border-red-500 focus:bg-slate-50 p-2"
                                 />

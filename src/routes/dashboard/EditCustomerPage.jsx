@@ -62,7 +62,7 @@ const EditCustomerPage = () => {
                                         <td className="px-4 py-3 dark:text-white">{customer.email}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.customerid}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.status}</td>
-                                        <td className="px-4 py-3 dark:text-white">{customer.company[0].name}</td>
+                                        <td className="px-4 py-3 dark:text-white">{customer.company[0]?.name}</td>
                                         <td className="px-4 py-3 flex gap-2">
                                             <Link to={"/layout/update-customer"}
                                                 state={{ LManagerCustId: customer._id }}>
