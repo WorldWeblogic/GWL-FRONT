@@ -9,7 +9,7 @@ const ManageProfile = () => {
     const [data, setData] = useState({
         firstname: "",
         lastname: "",
-        email: "",
+        password: "",
     });
 
     const location = useLocation()
@@ -28,7 +28,7 @@ const ManageProfile = () => {
         const updatedData = {
             firstname: data.firstname,
             lastname: data.lastname,
-            email: data.email,
+            password: data.password,
         };
 
         try {
@@ -41,7 +41,7 @@ const ManageProfile = () => {
             setData({
                 firstname: "",
                 lastname: "",
-                email: "",
+                password: "",
             })
             toast.success('Successfully updated!')
         } catch (err) {
@@ -57,7 +57,6 @@ const ManageProfile = () => {
             setData({
                 firstname: response.data.userdata.firstname,
                 lastname: response.data.userdata.lastname,
-                email: response.data.userdata.email
             })
         } catch (err) {
             console.log(`Error in Customer fetching : ${err}`);
@@ -102,14 +101,14 @@ const ManageProfile = () => {
                             />
                         </div>
                         <div className="flex flex-col">
-                            <label className="mb-1 dark:text-white">Email</label>
+                            <label className="mb-1 dark:text-white">password</label>
                             <input
-                                type="email"
-                                placeholder="Email"
-                                value={data.email}
+                                type="text"
+                                placeholder="password"
+                                value={data.password}
                                 onChange={handleChange}
-                                name="email"
-                                id="email"
+                                name="password"
+                                id="password"
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                             />
                         </div>
