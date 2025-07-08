@@ -10,9 +10,10 @@ import useOfferSync from "../../hooks/useOfferSync";
 
 const LowerManagerCompanyPage = () => {
     const [showPdfUrl, setShowPdfUrl] = useState(null);
-    const { companydata, fetchallcompany } = useAuth()
+    const { companydata, fetchallcompany, lowermanager, managerdata } = useAuth()
     useOfferSync(fetchallcompany);
-    const softdeletecompany = async (id) => {
+
+    const softdeletecompany = async (id, company, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         try {
             await API.put(
                 `/deletecompany/${id}`,
@@ -21,19 +22,19 @@ const LowerManagerCompanyPage = () => {
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
             toast.success('Delete company request send to supermanager Successfully!');
-            await handleSendMail();
+            await handleSendMail(company, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
         } catch (err) {
             const message = "deletion failed";
             toast.error(message);
             console.error("delete error:", err);
         }
     }
-    const handleSendMail = async () => {
+    const handleSendMail = async (company, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         try {
             const response = await API.post("/send-mail", {
-                to: "shantanu.kr.worldweblogic@gmail.com",
-                subject: "Deleting company came for Approval",
-                text: "This is a test email sent for offer deleting.",
+                to: [superManagerEmail],
+                subject: "Action Required: Please Review Company",
+                html: generateHtmlTemplate(company, lowerManagerFirstName, lowerManagerLastName)
             });
 
             toast.success(response.data.message);
@@ -42,6 +43,67 @@ const LowerManagerCompanyPage = () => {
             toast.error(error);
         }
     };
+
+    const generateHtmlTemplate = (company, lowerManagerFirstName, lowerManagerLastName) => {
+        return `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px 0;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Company Action Required</h2>
+      </div>
+      <div class="content">
+        <p>Dear Super Manager,</p>
+        <p>
+          A new Company has been added by 
+          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action for Delete.
+        </p>
+        <p><strong>Company Name:</strong> ${company.name}</p>
+        <p><strong>Email:</strong>${company.email}</p>
+
+        <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
+      </div>
+    </div>
+  </body>
+</html>
+  `;
+    };
+
+
     return (
         <div className="flex flex-col gap-y-4 p-6 min-h-screen">
             <div>
@@ -113,7 +175,7 @@ const LowerManagerCompanyPage = () => {
                                                     <PencilLine size={16} /> Manage
                                                 </button>
                                             </Link>
-                                            <button onClick={() => { softdeletecompany(company._id) }}
+                                            <button onClick={() => { softdeletecompany(company._id, company, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname) }}
                                                 className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded">
                                                 <Trash size={16} /> Delete
                                             </button>

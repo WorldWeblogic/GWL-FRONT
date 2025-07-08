@@ -6,7 +6,7 @@ import { useEffect } from "react"
 import API from "../../API/Api";
 
 const Addupcomingoffer = () => {
-    const { fetchupcomingalloffer, lowermanager } = useAuth();
+    const { fetchupcomingalloffer, lowermanager, managerdata } = useAuth();
     const [data, setdata] = useState({
         offerTitle: "",
         offerDescription: "",
@@ -35,7 +35,7 @@ const Addupcomingoffer = () => {
         });
     };
 
-    const handlesubmit = async (e) => {
+    const handlesubmit = async (e, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         e.preventDefault();
         try {
             await API.post(
@@ -63,6 +63,7 @@ const Addupcomingoffer = () => {
             });
             await fetchupcomingalloffer();
             toast.success("Upcoming offer created successfully!");
+            await handleSendMail(offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
         } catch (err) {
             const message = err.response?.data?.message || "offer created failed";
             toast.error(message);
@@ -79,7 +80,7 @@ const Addupcomingoffer = () => {
             offerDescription: "",
             startDate: "",
             endDate: "",
-            offerid: "OFF" + String(nextNumber).padStart(2, '0'),
+            offerid: "OFF" + String(nextNumber).padStart(2, '0')
         })
     }
 
@@ -87,13 +88,12 @@ const Addupcomingoffer = () => {
         getCusUpOfferId();
     }, [])
 
-    const handleSendMail = async (e) => {
-        e.preventDefault();
+    const handleSendMail = async (offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         try {
             const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Offer notification came for Approval",
-                text: "This is a test email sent from MERN app.",
+                to: [superManagerEmail],
+                subject: "Action Required : Please Review Employee Upcoming Offer",
+                html: generateHtmlTemplate(offer, lowerManagerFirstName, lowerManagerLastName),
             });
 
             toast.success(response.data.message);
@@ -102,6 +102,67 @@ const Addupcomingoffer = () => {
             toast.error(error);
         }
     };
+
+    const generateHtmlTemplate = (offer, lowerManagerFirstName, lowerManagerLastName) => {
+        return `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color:rgb(5, 114, 19);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px 0;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Upcoming Customer Offer Action Required</h2>
+      </div>
+      <div class="content">
+        <p>Dear Super Manager,</p>
+        <p>
+         Upcoming Customer Offer has been Added by 
+          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+        </p>
+        <p><strong>Offer Id:</strong>${offer.offerid}</p>
+        <p><strong>Offer Name:</strong> ${offer.offerTitle}</p>
+        <p><strong>Offer Description:</strong> ${offer.offerDescription}</p>
+
+        <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
+      </div>
+    </div>
+  </body>
+</html>
+  `;
+    };
+
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Add Customer Upcoming Offers</h1>
@@ -180,7 +241,11 @@ const Addupcomingoffer = () => {
 
                     <div className="mt-6">
                         <button
-                            onClick={(e) => { handlesubmit(e); handleSendMail(e); }}
+                            onClick={(e) => {
+                                handlesubmit(e,
+                                    data, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname
+                                )
+                            }}
                             type="submit"
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                         >

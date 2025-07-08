@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import API from "../../API/Api";
 
 const AddEmployeeOffers = () => {
-    const { fetchallemployeeoffer, lowermanager } = useAuth();
+    const { fetchallemployeeoffer, lowermanager, managerdata } = useAuth();
     // employee data
     const [data, setdata] = useState({
         offerTitle: "",
@@ -38,7 +38,7 @@ const AddEmployeeOffers = () => {
         });
     };
 
-    const employeehandlesubmit = async (e) => {
+    const employeehandlesubmit = async (e, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         e.preventDefault();
         try {
             await API.post(
@@ -66,7 +66,7 @@ const AddEmployeeOffers = () => {
             });
             await fetchallemployeeoffer();
             toast.success("Adding employee offer notification send for approval send to super manager!");
-            await handleSendMail();
+            await handleSendMail(e, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
         } catch (err) {
             const message = "offer created failed";
             toast.error(message);
@@ -91,13 +91,13 @@ const AddEmployeeOffers = () => {
         getEmpOfferId();
     }, [])
 
-    const handleSendMail = async (e) => {
+    const handleSendMail = async (e, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
-                to: "shantanu.kr.worldweblogic@gmail.com",
-                subject: "Adding employee offer came for Approval",
-                text: "This is a test email sent for offer adding.",
+                to: [superManagerEmail],
+                subject: "Action Required : Please Review Employee Offer",
+                html: generateHtmlTemplate(offer, lowerManagerFirstName, lowerManagerLastName)
             });
 
             toast.success(response.data.message);
@@ -106,6 +106,67 @@ const AddEmployeeOffers = () => {
             toast.error(error);
         }
     };
+
+    const generateHtmlTemplate = (offer, lowerManagerFirstName, lowerManagerLastName) => {
+        return `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color:rgb(5, 114, 19);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px 0;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Employee Offer Action Required</h2>
+      </div>
+      <div class="content">
+        <p>Dear Super Manager,</p>
+        <p>
+          Employee Offer has been Added by 
+          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+        </p>
+        <p><strong>Offer Id:</strong>${offer.offerid}</p>
+        <p><strong>Offer Name:</strong> ${offer.offerTitle}</p>
+        <p><strong>Offer Description:</strong> ${offer.offerDescription}</p>
+
+        <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
+      </div>
+    </div>
+  </body>
+</html>
+  `;
+    };
+
 
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
@@ -187,7 +248,11 @@ const AddEmployeeOffers = () => {
                     <div className="mt-6">
                         <button
                             type="submit"
-                            onClick={(e) => { employeehandlesubmit(e)}}
+                            onClick={(e) => {
+                                employeehandlesubmit(e,
+                                    data, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname
+                                )
+                            }}
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                         >
                             Submit

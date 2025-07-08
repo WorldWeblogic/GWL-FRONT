@@ -8,7 +8,7 @@ import useOfferSync from "../../hooks/useOfferSync";
 import { BASE_URL } from "../../API/Api";
 
 const CompanyPage = () => {
-    const { companydata, fetchallcompany } = useAuth();
+    const { companydata, fetchallcompany, lowermanager } = useAuth();
     const [showPdfUrl, setShowPdfUrl] = useState(null);
     useOfferSync(fetchallcompany);
     const softdeletecompany = async (id) => {
@@ -73,7 +73,6 @@ const CompanyPage = () => {
         getallrequest();
     }, [])
 
-
     const handleAction = async (id, approved) => {
         try {
             const response = await API.post(`/reviewpoints/${id}`, { approved });
@@ -89,46 +88,47 @@ const CompanyPage = () => {
         }
     };
 
-    const handleSendMail = async (action) => {
-    let subject = "";
-    let text = "";
-    let to = [];
 
-    if (action === "approve") {
-        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Offer Approved";
-        text = "Your offer has been approved."; 
-    } else if (action === "decline") {
-        to = ["shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Offer Declined";
-        text = "Your offer has been declined.";
-    } else if (action === "delete") {
-        to = ["shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Offer Deleted";
-        text = "Your offer was deleted.";
-    } else if (action === "give") {
-        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Points give";
-        text = "Your offer has been approved."; 
-    } else if (action === "redeem") {
-        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Points redeem";
-        text = "Your offer has been approved."; 
-    }
+    const handleSendMail = async (action, managerEmail) => {
+        let subject = "";
+        let text = "";
+        let to = [];
 
-    try {
-        const response = await API.post("/send-mail", {
-            to,
-            subject,
-            text,
-        });
+        if (action === "approve") {
+            to = [managerEmail];
+            subject = "Offer Approved";
+            text = "Your offer has been approved.";
+        } else if (action === "decline") {
+            to = [managerEmail];
+            subject = "Offer Declined";
+            text = "Your offer has been declined.";
+        } else if (action === "delete") {
+            to = [managerEmail];
+            subject = "Offer Deleted";
+            text = "Your offer was deleted.";
+        } else if (action === "give") {
+            to = [managerEmail];
+            subject = "Points give";
+            text = "Your offer has been approved.";
+        } else if (action === "redeem") {
+            to = [managerEmail];
+            subject = "Points redeem";
+            text = "Your offer has been approved.";
+        }
 
-        toast.success(response.data.message);
-    } catch (error) {
-        console.error("Mail send error:", error);
-        toast.error("Failed to send email");
-    }
-};
+        try {
+            const response = await API.post("/send-mail", {
+                to,
+                subject,
+                text,
+            });
+
+            toast.success(response.data.message);
+        } catch (error) {
+            console.error("Mail send error:", error);
+            toast.error("Failed to send email");
+        }
+    };
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
             <div>
@@ -194,20 +194,20 @@ const CompanyPage = () => {
 
                                         <td className="flex gap-2 px-4 py-3">
                                             <button
-                                                onClick={() => { approvecompany(company._id); handleSendMail("approve"); }}
+                                                onClick={() => { approvecompany(company._id); handleSendMail("approve", lowermanager.email); }}
                                                 className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                             >
                                                 <PencilLine size={16} /> Approve
                                             </button>
 
                                             <button
-                                                onClick={() => { declinecompany(company._id); handleSendMail("decline"); }}
+                                                onClick={() => { declinecompany(company._id); handleSendMail("decline", lowermanager.email); }}
                                                 className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Decline
                                             </button>
                                             <button
-                                                onClick={() => { softdeletecompany(company._id); handleSendMail("delete"); }}
+                                                onClick={() => { softdeletecompany(company._id); handleSendMail("delete", lowermanager.email); }}
                                                 className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete

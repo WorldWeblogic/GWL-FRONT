@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import API from "../../API/Api";
 
 const AddOffers = () => {
-    const { fetchalloffer, lowermanager } = useAuth();
+    const { fetchalloffer, lowermanager, managerdata } = useAuth();
     const [data, setdata] = useState({
         offerTitle: "",
         offerDescription: "",
@@ -35,7 +35,7 @@ const AddOffers = () => {
         });
     };
 
-    const handlesubmit = async (e) => {
+    const handlesubmit = async (e, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         e.preventDefault();
         try {
             await API.post(
@@ -63,7 +63,7 @@ const AddOffers = () => {
             });
             await fetchalloffer();
             toast.success("Adding offer notification send for approval send to super manager!");
-            await handleSendMail(e);
+            await handleSendMail(e, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
         } catch (err) {
             const message = "offer created failed";
             toast.error(message);
@@ -90,13 +90,13 @@ const AddOffers = () => {
         getLastOfferId();
     }, [])
 
-    const handleSendMail = async (e) => {
+    const handleSendMail = async (e, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
-                to: "shantanu.kr.worldweblogic@gmail.com",
+                to: [superManagerEmail],
                 subject: "Adding customer offer came for Approval",
-                text: "This is a test email sent for offer adding.",
+                html: generateHtmlTemplate(offer, lowerManagerFirstName, lowerManagerLastName)
             });
 
             toast.success(response.data.message);
@@ -105,6 +105,67 @@ const AddOffers = () => {
             toast.error(error);
         }
     };
+
+    const generateHtmlTemplate = (offer, lowerManagerFirstName, lowerManagerLastName) => {
+        return `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color:rgb(5, 114, 19);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px 0;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Customer Offer Action Required</h2>
+      </div>
+      <div class="content">
+        <p>Dear Super Manager,</p>
+        <p>
+          A Customer Offer has been Added by 
+          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+        </p>
+        <p><strong>Offer Id:</strong>${offer.offerid}</p>
+        <p><strong>Offer Name:</strong> ${offer.offerTitle}</p>
+        <p><strong>Offer Description:</strong> ${offer.offerDescription}</p>
+
+        <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
+      </div>
+    </div>
+  </body>
+</html>
+  `;
+    };
+
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Add Customers Offers</h1>
@@ -184,7 +245,11 @@ const AddOffers = () => {
 
                     <div className="mt-6">
                         <button
-                            onClick={(e) => { handlesubmit(e) }}
+                            onClick={(e) => {
+                                handlesubmit(e,
+                                    data, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname
+                                )
+                            }}
                             type="submit"
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                         >

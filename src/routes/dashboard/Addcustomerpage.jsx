@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const AddcustomerPage = () => {
-    const { fetchalluser, lowermanager } = useAuth();
+    const { fetchalluser, lowermanager, managerdata } = useAuth();
     const [company, setCompany] = useState([]);
     const [data, setdata] = useState({
         firstname: "",
@@ -25,7 +25,7 @@ const AddcustomerPage = () => {
     };
 
 
-    const handlesubmit = async (e) => {
+    const handlesubmit = async (e, superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName) => {
         e.preventDefault();
         try {
             await API.post(
@@ -36,6 +36,7 @@ const AddcustomerPage = () => {
                         lowermanager && lowermanager.firstname && lowermanager.lastname
                             ? `${lowermanager.firstname} ${lowermanager.lastname}`
                             : "Created by Super Manager / Admin",
+                    managerEmail: lowermanager.email
                 },
                 {
                     headers: {
@@ -54,7 +55,7 @@ const AddcustomerPage = () => {
             });
             await fetchalluser();
             toast.success("customer created successfully !");
-            await handleSendMail(e);
+            await handleSendMail(e, superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName);
         } catch (err) {
             const message = err.response?.data?.message || "Signup failed";
             toast.error(message);
@@ -70,7 +71,6 @@ const AddcustomerPage = () => {
             firstname: "",
             lastname: "",
             email: "",
-            employeeid: "",
             password: "",
             companyId: "",
             customerid: "CUS" + String(nextNumber).padStart(2, "0"),
@@ -87,13 +87,13 @@ const AddcustomerPage = () => {
         getCompanyName();
     }, []);
 
-    const handleSendMail = async (e) => {
+    const handleSendMail = async (e, superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Adding customer notification came for Approval",
-                text: "This is a test email sent for customer adding.",
+                to: [superManagerEmail],
+                subject: "Action Required: Please Review Customer",
+                html: generateHtmlTemplate(customer, lowerManagerFirstName, lowerManagerLastName)
             });
 
             toast.success(response.data.message);
@@ -101,6 +101,66 @@ const AddcustomerPage = () => {
             console.error(error);
             toast.error(error);
         }
+    };
+
+
+    const generateHtmlTemplate = (customer, lowerManagerFirstName, lowerManagerLastName) => {
+        return `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color:rgb(55, 105, 180);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px 0;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Customer Action Required</h2>
+      </div>
+      <div class="content">
+        <p>Dear Super Manager,</p>
+        <p>
+          A new customer has been added by 
+          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+        </p>
+        <p><strong>Customer Name:</strong> ${customer.firstname} ${customer.lastname}</p>
+        <p><strong>Email:</strong>${customer.email}</p>
+
+        <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
+      </div>
+    </div>
+  </body>
+</html>
+  `;
     };
 
     return (
@@ -203,7 +263,7 @@ const AddcustomerPage = () => {
                     <div className="mt-6">
                         <button
                             onClick={(e) => {
-                                handlesubmit(e);
+                                handlesubmit(e, managerdata[0]?.email, data, lowermanager.firstname, lowermanager.lastname);
                             }}
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                         >

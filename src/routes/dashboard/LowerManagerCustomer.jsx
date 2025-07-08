@@ -7,28 +7,31 @@ import API from "../../API/Api";
 import useOfferSync from "../../hooks/useOfferSync";
 
 const LowerManagerCustomer = () => {
-    const { customersdata, fetchalluser } = useAuth();
+    const { customersdata, fetchalluser, managerdata, lowermanager } = useAuth();
     useOfferSync(fetchalluser);
-    const rejectCustomer = async (id) => {
+
+    const rejectCustomer = async (id, superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName) => {
         try {
             const response = await API.put(`/deletecustomer/${id}`);
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            toast.success(response.data.message); 
-            await handleSendMail();
+            toast.success(response.data.message);
+            await handleSendMail(superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName);
         } catch (err) {
             const errorMessage = err.response?.data?.message || "reject failed";
             toast.error(errorMessage);
             console.error(err);
         }
     };
-    const handleSendMail = async () => {
+
+
+    const handleSendMail = async (superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName) => {
         try {
             const response = await API.post("/send-mail", {
-                to: "shantanu.kr.worldweblogic@gmail.com",
-                subject: "Deleting customer came for Approval",
-                text: "This is a test email sent for offer deleting.",
+                to: [superManagerEmail],
+                subject: "Action Required: Please Review Customer Deletion",
+                html: generateHtmlTemplate(customer, lowerManagerFirstName, lowerManagerLastName)
             });
 
             toast.success(response.data.message);
@@ -37,6 +40,67 @@ const LowerManagerCustomer = () => {
             toast.error(error);
         }
     };
+
+    const generateHtmlTemplate = (customer, lowerManagerFirstName, lowerManagerLastName) => {
+        return `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px 0;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Customer Action Required</h2>
+      </div>
+      <div class="content">
+        <p>Dear Super Manager,</p>
+        <p>
+          A new customer has been added by 
+          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+        </p>
+        <p><strong>Customer Name:</strong> ${customer.firstname} ${customer.lastname}</p>
+        <p><strong>Email:</strong>${customer.email}</p>
+
+        <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
+      </div>
+    </div>
+  </body>
+</html>
+  `;
+    };
+
+
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
             <div>
@@ -75,7 +139,7 @@ const LowerManagerCustomer = () => {
                                         </td>
                                         <td className="px-4 py-3 dark:text-white">{customer.email}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.customerid}</td>
-                                        <td className="px-4 py-3 dark:text-white">{customer.company[0].name}</td>
+                                        <td className="px-4 py-3 dark:text-white">{customer?.company[0]?.name}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.status}</td>
                                         <td className="flex gap-2 px-4 py-3">
                                             <Link to={"/LowerManagerlayout/manage-customer"}
@@ -87,7 +151,7 @@ const LowerManagerCustomer = () => {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={() => { rejectCustomer(customer._id) }}
+                                                onClick={() => { rejectCustomer(customer._id, managerdata[0]?.email, customer, lowermanager.firstname, lowermanager.lastname) }}
                                                 className="my-1 flex items-center gap-1 rounded bg-red-500 px-3 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete

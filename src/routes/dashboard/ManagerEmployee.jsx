@@ -26,8 +26,6 @@ const ManagerEmployee = () => {
         }
     };
 
-    console.log(employeedata);
-
     // approve employee
     const approveEmployee = async (id) => {
         try {
@@ -85,46 +83,61 @@ const ManagerEmployee = () => {
         }
     };
 
-    const handleSendMail = async (action) => {
-    let subject = "";
-    let text = "";
-    let to = [];
+    const handleSendMail = async (action, managerEmail, employeeEmail) => {
 
-    if (action === "approve") {
-        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Employee Approved";
-        text = "Your offer has been approved."; 
-    } else if (action === "decline") {
-        to = ["shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Employee Declined";
-        text = "Your offer has been declined.";
-    } else if (action === "delete") {
-        to = ["shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Employee Deleted";
-        text = "Your offer was deleted.";
-    } else if (action === "give") {
-        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Points give";
-        text = "Your offer has been approved."; 
-    } else if (action === "redeem") {
-        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Points redeem";
-        text = "Your offer has been approved."; 
-    }
+        let subject = "";
+        let html = "";
+        let to = [];
 
-    try {
-        const response = await API.post("/send-mail", {
-            to,
-            subject,
-            text,
-        });
+        switch (action) {
+            case "approve":
+                to = [managerEmail, employeeEmail];
+                subject = "Employee Approved";
+                html = "<p>Your offer has been Approved.</p>";
+                break;
 
-        toast.success(response.data.message);
-    } catch (error) {
-        console.error("Mail send error:", error);
-        toast.error("Failed to send email");
-    }
-};
+            case "decline":
+                to = [managerEmail, employeeEmail];
+                subject = "Employee Declined";
+                html = "<p>Your offer has been Declined.</p>";
+                break;
+
+            case "delete":
+                to = [managerEmail, employeeEmail];
+                subject = "Employee Deleted";
+                html = "<p>Your offer has been Deleted.</p>";
+                break;
+
+            case "give":
+                to = [managerEmail, employeeEmail];
+                subject = "Points Given";
+                html = "<p>Points have been successfully credited.</p>";
+                break;
+
+            case "redeem":
+                to = [managerEmail, employeeEmail];
+                subject = "Points Redeemed";
+                html = "<p>Points have been successfully redeemed.</p>";
+                break;
+
+            default:
+                toast.error("Unknown email action type.");
+                return;
+        }
+
+        try {
+            const response = await API.post("/send-mail", {
+                to,
+                subject,
+                html,
+            });
+
+            toast.success(response.data.message);
+        } catch (error) {
+            console.error("Mail send error:", error);
+            toast.error("Failed to send email");
+        }
+    };
 
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
@@ -171,7 +184,7 @@ const ManagerEmployee = () => {
                                             <button
                                                 onClick={() => {
                                                     approveEmployee(employee._id);
-                                                    handleSendMail("approve");
+                                                    handleSendMail("approve", employee.managerEmail, employee.email);
                                                 }}
                                                 className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                             >
@@ -181,7 +194,7 @@ const ManagerEmployee = () => {
                                             <button
                                                 onClick={() => {
                                                     declineEmployee(employee._id);
-                                                    handleSendMail("decline");
+                                                    handleSendMail("decline", employee.managerEmail);
                                                 }}
                                                 className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                             >
@@ -190,7 +203,7 @@ const ManagerEmployee = () => {
                                             <button
                                                 onClick={() => {
                                                     softdeleteemployee(employee._id);
-                                                    handleSendMail("delete");
+                                                    handleSendMail("delete", employee.managerEmail);
                                                 }}
                                                 className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                                             >

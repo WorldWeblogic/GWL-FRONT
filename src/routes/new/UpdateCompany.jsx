@@ -19,8 +19,7 @@ const UpdateCompany = () => {
         phone: "",
         email: "",
         companyaddress: "",
-        employeeid: "",
-        emiratesId: ""
+        employeeid: ""
     });
 
     const location = useLocation();
@@ -45,7 +44,6 @@ const UpdateCompany = () => {
         formData.append("phone", data.phone);
         formData.append("employeeid", data.employeeid);
         formData.append("companyaddress", data.companyaddress);
-        formData.append("emiratesId", data.emiratesId);
 
         if (pdf1) formData.append("pdf1", pdf1);
 
@@ -70,8 +68,6 @@ const UpdateCompany = () => {
                 employeeid: "",
                 companyaddress: ""
             });
-
-            //getemiratedId Api
 
         } catch (err) {
             toast.error("Update failed");
@@ -230,20 +226,6 @@ const UpdateCompany = () => {
                                     />
                                 </div>
 
-                                <div className="flex flex-col">
-                                    <label className="mb-1 dark:text-white">Emirates ID</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Emirates Id"
-                                        value={data.emiratesId}
-                                        onChange={handleChange}
-                                        name="emiratesId"
-                                        id="emiratesId"
-                                        readOnly
-                                        className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
-                                    />
-                                </div>
-
                             </div>
                             <div className="flex flex-col">
                                 <label className="mb-1 mt-3 dark:text-white">Company address</label>
@@ -338,15 +320,6 @@ const UpdateCompany = () => {
                                         type="file"
                                         accept="application/pdf"
                                         onChange={(e) => setPdf1(e.target.files[0])}
-                                        className="w-full appearance-none rounded border px-3 py-2 text-black shadow dark:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500 bg-white"
-                                    />
-                                </div>
-                                <div className="flex flex-col">
-                                    <label className="mb-1 dark:text-white">Upload Licence</label>
-                                    <input
-                                        type="file"
-                                        accept="application/pdf"
-                                        onChange={(e) => setPdf2(e.target.files[0])}
                                         className="w-full appearance-none rounded border px-3 py-2 text-black shadow dark:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500 bg-white"
                                     />
                                 </div>

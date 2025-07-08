@@ -7,28 +7,28 @@ import API from "../../API/Api";
 import useOfferSync from "../../hooks/useOfferSync";
 
 const LowerManagerEmployee = () => {
-    const { employeedata, fetchallemployee } = useAuth();
+    const { employeedata, fetchallemployee, managerdata, lowermanager } = useAuth();
     useOfferSync(fetchallemployee);
-    const rejectEmp = async (id) => {
+    const rejectEmp = async (id, employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         try {
             await API.put(`/deleteEmp/${id}`);
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
             toast.success("Delete employee request send to super manager Successfully!");
-            await handleSendMail();
+            await handleSendMail(employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
         } catch (err) {
             const message = err.response?.data?.message || "deletion failed";
             toast.error(message);
             console.error("delete error:", err);
         }
     };
-    const handleSendMail = async () => {
+    const handleSendMail = async (employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
         try {
             const response = await API.post("/send-mail", {
-                to: "shantanu.kr.worldweblogic@gmail.com",
-                subject: "Deleting employee came for Approval",
-                text: "This is a test email sent for offer deleting.",
+                to: [superManagerEmail],
+                subject: "Action Required: Please Review Employee",
+                html: generateHtmlTemplate(employee, lowerManagerFirstName, lowerManagerLastName)
             });
 
             toast.success(response.data.message);
@@ -37,6 +37,66 @@ const LowerManagerEmployee = () => {
             toast.error(error);
         }
     };
+
+    const generateHtmlTemplate = (employee, lowerManagerFirstName, lowerManagerLastName) => {
+        return `
+   <!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+      .header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+      }
+      .content {
+        padding: 20px;
+        color: #333;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px 0;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Employee Action Required</h2>
+      </div>
+      <div class="content">
+        <p>Dear Super Manager,</p>
+        <p>
+          A new customer has been added by 
+          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+        </p>
+        <p><strong>Employee Name:</strong> ${employee.firstname} ${employee.lastname}</p>
+        <p><strong>Email:</strong>${employee.email}</p>
+
+        <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
+      </div>
+    </div>
+  </body>
+</html>
+  `;
+    };
+
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
             <div>
@@ -104,7 +164,7 @@ const LowerManagerEmployee = () => {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={() => { rejectEmp(employee._id) }}
+                                                onClick={() => { rejectEmp(employee._id, employee, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname) }}
                                                 className="flex items-center gap-1 rounded bg-red-500 px-3 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete
