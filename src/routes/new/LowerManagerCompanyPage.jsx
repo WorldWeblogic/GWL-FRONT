@@ -10,7 +10,7 @@ import useOfferSync from "../../hooks/useOfferSync";
 
 const LowerManagerCompanyPage = () => {
     const [showPdfUrl, setShowPdfUrl] = useState(null);
-    const { companydata, fetchallcompany, lowermanager, managerdata } = useAuth()
+    const { companydata, fetchallcompany, managerdata } = useAuth()
     useOfferSync(fetchallcompany);
 
     const softdeletecompany = async (id, company, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
@@ -44,7 +44,8 @@ const LowerManagerCompanyPage = () => {
         }
     };
 
-    const generateHtmlTemplate = (company, lowerManagerFirstName, lowerManagerLastName) => {
+
+    const generateHtmlTemplate = (company, lowerManagerName, lowerManagerEmail) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -60,7 +61,7 @@ const LowerManagerCompanyPage = () => {
         background-color: #f9f9f9;
       }
       .header {
-        background-color: #4CAF50;
+        background-color:rgb(175, 76, 76);
         color: white;
         padding: 15px;
         text-align: center;
@@ -79,7 +80,7 @@ const LowerManagerCompanyPage = () => {
         border-radius: 5px;
         color: white;
       }
-    </style>
+  </style>
   </head>
   <body>
     <div class="container">
@@ -89,11 +90,12 @@ const LowerManagerCompanyPage = () => {
       <div class="content">
         <p>Dear Super Manager,</p>
         <p>
-          A new Company has been added by 
-          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action for Delete.
+          A new company has been Deleted by <br>
+          <strong>Manager Name :</strong> ${lowerManagerName} <br>
+          <strong>Manager Email : </strong>${lowerManagerEmail} and requires your action.
         </p>
-        <p><strong>Company Name:</strong> ${company.name}</p>
-        <p><strong>Email:</strong>${company.email}</p>
+        <p><strong>Company ID:</strong> ${company.companyId} <br>
+        <strong>Company Name:</strong> ${company.name}<br>
 
         <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
       </div>
@@ -175,7 +177,7 @@ const LowerManagerCompanyPage = () => {
                                                     <PencilLine size={16} /> Manage
                                                 </button>
                                             </Link>
-                                            <button onClick={() => { softdeletecompany(company._id, company, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname) }}
+                                            <button onClick={() => { softdeletecompany(company._id, company, managerdata[0]?.email, companydata[0]?.manager, companydata[0]?.managerEmail) }}
                                                 className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded">
                                                 <Trash size={16} /> Delete
                                             </button>

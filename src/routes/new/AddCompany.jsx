@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const AddCompany = () => {
-    const { fetchallcompany, lowermanager, managerdata } = useAuth();
+    const { fetchallcompany, lowermanager, managerdata, companydata } = useAuth();
     const phone = useRef();
     const [emiratesId, setEmiratesId] = useState("");
     const [data, setData] = useState({
@@ -16,7 +16,6 @@ const AddCompany = () => {
         companyaddress: "",
         employeeid: "",
     });
-
 
     const [pdf1, setPdf1] = useState(null);
 
@@ -46,7 +45,7 @@ const AddCompany = () => {
         }
     };
 
-    const handleSubmit = async (e, company, superManagerEmail, lowermanagerFirstName, lowermanagerLastName) => {
+    const handleSubmit = async (e, company, superManagerEmail, lowermanagerName, lowermanagerEmail) => {
         e.preventDefault();
 
         if (!data.name || !data.email || !data.phone || !data.companyaddress || !data.employeeid) {
@@ -66,6 +65,7 @@ const AddCompany = () => {
                 ? `${lowermanager.firstname} ${lowermanager.lastname}`
                 : "Created by Super Manager / Admin"
         );
+        formData.append("managerEmail", lowermanager.email);
 
         try {
             await API.post("/create-company", formData, {
@@ -86,19 +86,19 @@ const AddCompany = () => {
             setPdf1(null);
             getComId();
             getEmiratesID();
-            await handleSendMail(e, company, superManagerEmail, lowermanagerFirstName, lowermanagerLastName);
+            await handleSendMail(e, company, superManagerEmail, lowermanagerName, lowermanagerEmail);
         } catch (err) {
             toast.error(err.response?.data?.message || "Error occurred");
         }
     };
 
-    const handleSendMail = async (e, company, superManagerEmail, lowermanagerFirstName, lowermanagerLastName) => {
+    const handleSendMail = async (e, company, superManagerEmail, lowermanagerName, lowermanagerEmail) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required: Please Review New Company Add Request",
-                html: generateHtmlTemplate(company, lowermanagerFirstName, lowermanagerLastName)
+                html: generateHtmlTemplate(company, lowermanagerName, lowermanagerEmail)
             });
 
             toast.success(response.data.message);
@@ -113,7 +113,7 @@ const AddCompany = () => {
         setEmiratesId(response.data.emetID);
     }
 
-    const generateHtmlTemplate = (company, lowerManagerFirstName, lowerManagerLastName) => {
+    const generateHtmlTemplate = (company, lowermanagerName, lowermanagerEmail) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -129,7 +129,7 @@ const AddCompany = () => {
         background-color: #f9f9f9;
       }
       .header {
-        background-color: #4CAF50;
+        background-color:rgb(55, 105, 180);
         color: white;
         padding: 15px;
         text-align: center;
@@ -158,11 +158,12 @@ const AddCompany = () => {
       <div class="content">
         <p>Dear Super Manager,</p>
         <p>
-          A new Company has been added by 
-          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+          A new company has been added by <br>
+          <strong>Manager Name :</strong> ${lowermanagerName} <br>
+          <strong>Manager Email : </strong>${lowermanagerEmail} and requires your action.
         </p>
-        <p><strong>Company Name:</strong> ${company.name}</p>
-        <p><strong>Company Email:</strong>${company.email}</p>
+        <p><strong>Company ID:</strong> ${company.companyId} <br>
+        <strong>Company Name:</strong> ${company.name} </p>
 
         <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
       </div>
@@ -280,7 +281,7 @@ const AddCompany = () => {
 
                     <div className="mt-6">
                         <button
-                            onClick={(e) => { handleSubmit(e, data, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname) }}
+                            onClick={(e) => { handleSubmit(e, data, managerdata[0]?.email, companydata[0].manager, companydata[0].managerEmail) }}
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                         >
                             Submit

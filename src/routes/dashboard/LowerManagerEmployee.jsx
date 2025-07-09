@@ -7,28 +7,29 @@ import API from "../../API/Api";
 import useOfferSync from "../../hooks/useOfferSync";
 
 const LowerManagerEmployee = () => {
-    const { employeedata, fetchallemployee, managerdata, lowermanager } = useAuth();
+    const { employeedata, fetchallemployee, managerdata } = useAuth();
+
     useOfferSync(fetchallemployee);
-    const rejectEmp = async (id, employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const rejectEmp = async (id, employee, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
         try {
             await API.put(`/deleteEmp/${id}`);
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
             toast.success("Delete employee request send to super manager Successfully!");
-            await handleSendMail(employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
+            await handleSendMail(employee, superManagerEmail, lowerManagerName, lowerManagerEmail);
         } catch (err) {
             const message = err.response?.data?.message || "deletion failed";
             toast.error(message);
             console.error("delete error:", err);
         }
     };
-    const handleSendMail = async (employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const handleSendMail = async (employee, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required: Please Review Employee",
-                html: generateHtmlTemplate(employee, lowerManagerFirstName, lowerManagerLastName)
+                html: generateHtmlTemplate(employee, lowerManagerName, lowerManagerEmail)
             });
 
             toast.success(response.data.message);
@@ -38,7 +39,7 @@ const LowerManagerEmployee = () => {
         }
     };
 
-    const generateHtmlTemplate = (employee, lowerManagerFirstName, lowerManagerLastName) => {
+    const generateHtmlTemplate = (employee, lowerManagerName, lowerManagerEmail) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -54,7 +55,7 @@ const LowerManagerEmployee = () => {
         background-color: #f9f9f9;
       }
       .header {
-        background-color: #4CAF50;
+        background-color:rgb(175, 76, 76);
         color: white;
         padding: 15px;
         text-align: center;
@@ -73,21 +74,23 @@ const LowerManagerEmployee = () => {
         border-radius: 5px;
         color: white;
       }
-    </style>
+  </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h2>Employee Action Required</h2>
+        <h2>EMployee Action Required</h2>
       </div>
       <div class="content">
         <p>Dear Super Manager,</p>
         <p>
-          A new customer has been added by 
-          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+          A new Employee has been Deleted by <br>
+          <strong>Manager Name :</strong> ${lowerManagerName} <br>
+          <strong>Manager Email : </strong>${lowerManagerEmail} and requires your action.
         </p>
-        <p><strong>Employee Name:</strong> ${employee.firstname} ${employee.lastname}</p>
-        <p><strong>Email:</strong>${employee.email}</p>
+        <p><strong>Employee ID:</strong> ${employee.employeeid} <br>
+        <strong>Employee Name:</strong> ${employee.firstname} ${employee.lastname} <br>
+        <strong>Employee Email:</strong>${employee.email}</p>
 
         <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
       </div>
@@ -164,7 +167,7 @@ const LowerManagerEmployee = () => {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={() => { rejectEmp(employee._id, employee, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname) }}
+                                                onClick={() => { rejectEmp(employee._id, employee, managerdata[0]?.email, employeedata[0]?.manager, employeedata[0]?.managerEmail) }}
                                                 className="flex items-center gap-1 rounded bg-red-500 px-3 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete

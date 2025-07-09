@@ -7,17 +7,17 @@ import API from "../../API/Api";
 import useOfferSync from "../../hooks/useOfferSync";
 
 const LowerManagerCustomer = () => {
-    const { customersdata, fetchalluser, managerdata, lowermanager } = useAuth();
+    const { customersdata, fetchalluser, managerdata } = useAuth();
     useOfferSync(fetchalluser);
 
-    const rejectCustomer = async (id, superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName) => {
+    const rejectCustomer = async (id, superManagerEmail, customer, lowerManagerName, lowerManagerEmail) => {
         try {
             const response = await API.put(`/deletecustomer/${id}`);
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
             toast.success(response.data.message);
-            await handleSendMail(superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName);
+            await handleSendMail(superManagerEmail, customer, lowerManagerName, lowerManagerEmail);
         } catch (err) {
             const errorMessage = err.response?.data?.message || "reject failed";
             toast.error(errorMessage);
@@ -26,12 +26,12 @@ const LowerManagerCustomer = () => {
     };
 
 
-    const handleSendMail = async (superManagerEmail, customer, lowerManagerFirstName, lowerManagerLastName) => {
+    const handleSendMail = async (superManagerEmail, customer, lowerManagerName, lowerManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required: Please Review Customer Deletion",
-                html: generateHtmlTemplate(customer, lowerManagerFirstName, lowerManagerLastName)
+                html: generateHtmlTemplate(customer, lowerManagerName, lowerManagerEmail)
             });
 
             toast.success(response.data.message);
@@ -41,7 +41,7 @@ const LowerManagerCustomer = () => {
         }
     };
 
-    const generateHtmlTemplate = (customer, lowerManagerFirstName, lowerManagerLastName) => {
+    const generateHtmlTemplate = (customer, lowerManagerName, lowerManagerEmail) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -57,7 +57,7 @@ const LowerManagerCustomer = () => {
         background-color: #f9f9f9;
       }
       .header {
-        background-color: #4CAF50;
+        background-color:rgb(175, 76, 76);
         color: white;
         padding: 15px;
         text-align: center;
@@ -76,7 +76,7 @@ const LowerManagerCustomer = () => {
         border-radius: 5px;
         color: white;
       }
-    </style>
+  </style>
   </head>
   <body>
     <div class="container">
@@ -86,11 +86,13 @@ const LowerManagerCustomer = () => {
       <div class="content">
         <p>Dear Super Manager,</p>
         <p>
-          A new customer has been added by 
-          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+          A new customer has been Deleted by <br>
+          <strong>Manager Name :</strong> ${lowerManagerName} <br>
+          <strong>Manager Email : </strong>${lowerManagerEmail} and requires your action.
         </p>
-        <p><strong>Customer Name:</strong> ${customer.firstname} ${customer.lastname}</p>
-        <p><strong>Email:</strong>${customer.email}</p>
+        <p><strong>Customer ID:</strong> ${customer.customerid} <br>
+        <strong>Customer Name:</strong> ${customer.firstname} ${customer.lastname} <br>
+        <strong>Customer Email:</strong>${customer.email}</p>
 
         <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
       </div>
@@ -151,7 +153,7 @@ const LowerManagerCustomer = () => {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={() => { rejectCustomer(customer._id, managerdata[0]?.email, customer, lowermanager.firstname, lowermanager.lastname) }}
+                                                onClick={() => { rejectCustomer(customer._id, managerdata[0]?.email, customer, customersdata[0]?.manager, customersdata[0]?.managerEmail) }}
                                                 className="my-1 flex items-center gap-1 rounded bg-red-500 px-3 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete
