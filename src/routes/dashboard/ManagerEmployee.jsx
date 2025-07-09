@@ -7,7 +7,7 @@ import API from "../../API/Api";
 import useOfferSync from "../../hooks/useOfferSync";
 
 const ManagerEmployee = () => {
-    const { employeedata, fetchallemployee } = useAuth();
+    const { employeedata, fetchallemployee, lowermanager } = useAuth();
     useOfferSync(fetchallemployee);
     const softdeleteemployee = async (id) => {
         try {
@@ -82,6 +82,7 @@ const ManagerEmployee = () => {
             console.error(err);
         }
     };
+
 
     const handleSendMail = async (action, managerEmail, employeeEmail) => {
 

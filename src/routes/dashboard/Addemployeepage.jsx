@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const AddemployeePage = () => {
-    const { lowermanager, fetchallemployee, managerdata } = useAuth();
+    const { lowermanager, fetchallemployee, managerdata, employeedata } = useAuth();
     const phone = useRef();
     function handlenumber(e) {
         // Remove all characters except digits and dashes
@@ -26,9 +26,10 @@ const AddemployeePage = () => {
             ...prev,
             [name]: value,
         }));
-    };
+    }
 
-    const handlesubmit = async (e, employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+
+    const handlesubmit = async (e, employee, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
         e.preventDefault();
         try {
             await API.post(
@@ -58,7 +59,7 @@ const AddemployeePage = () => {
             });
             await fetchallemployee();
             toast.success("employee added successfully !");
-            await handleSendMail(e, employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
+            await handleSendMail(e, employee, superManagerEmail, lowerManagerName, lowerManagerEmail);
         } catch (err) {
             const message = err.response.data.message || "adding employee failed";
             toast.error(message);
@@ -84,13 +85,13 @@ const AddemployeePage = () => {
         getEmpId();
     }, [])
 
-    const handleSendMail = async (e, employee, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const handleSendMail = async (e, employee, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required: Please Review Employee",
-                html: generateHtmlTemplate(employee, lowerManagerFirstName, lowerManagerLastName)
+                html: generateHtmlTemplate(employee, lowerManagerName, lowerManagerEmail)
             });
 
             toast.success(response.data.message);
@@ -100,9 +101,9 @@ const AddemployeePage = () => {
         }
     };
 
-    const generateHtmlTemplate = (employee, lowerManagerFirstName, lowerManagerLastName) => {
+    const generateHtmlTemplate = (employee, lowerManagerName, lowerManagerEmail) => {
         return `
-   <!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
   <head>
     <style>
@@ -116,7 +117,7 @@ const AddemployeePage = () => {
         background-color: #f9f9f9;
       }
       .header {
-        background-color: #4CAF50;
+        background-color:rgb(55, 105, 180);
         color: white;
         padding: 15px;
         text-align: center;
@@ -145,11 +146,13 @@ const AddemployeePage = () => {
       <div class="content">
         <p>Dear Super Manager,</p>
         <p>
-          A new customer has been added by 
-          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+          A new Employee has been added by <br>
+          <strong>Manager Name : </strong> ${lowerManagerName} <br>
+          <strong>Manager Email : </strong>${lowerManagerEmail} and requires your action.
         </p>
-        <p><strong>Employee Name:</strong> ${employee.firstname} ${employee.lastname}</p>
-        <p><strong>Email:</strong>${employee.email}</p>
+        <p><strong>Employee ID : </strong> ${employee.employeeid} <br>
+        <strong>Employee Name : </strong> ${employee.firstname} ${employee.lastname} <br>
+        <strong>Employee Email : </strong>${employee.email}</p>
 
         <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
       </div>
@@ -255,7 +258,7 @@ const AddemployeePage = () => {
                     <div className="mt-6">
                         <button
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
-                            onClick={(e) => { handlesubmit(e, data, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname) }}
+                            onClick={(e) => { handlesubmit(e, data, managerdata[0]?.email, employeedata[0]?.manager, employeedata[0]?.managerEmail) }}
                         >
                             Submit
                         </button>
