@@ -8,7 +8,7 @@ import useOfferSync from "../../hooks/useOfferSync";
 import { BASE_URL } from "../../API/Api";
 
 const CompanyPage = () => {
-    const { companydata, fetchallcompany, lowermanager } = useAuth();
+    const { companydata, fetchallcompany } = useAuth();
     const [showPdfUrl, setShowPdfUrl] = useState(null);
     useOfferSync(fetchallcompany);
     const softdeletecompany = async (id) => {
@@ -89,41 +89,65 @@ const CompanyPage = () => {
     };
 
 
-    const handleSendMail = async (action, managerEmail) => {
-        let subject = "";
-        let text = "";
-        let to = [];
-
-        if (action === "approve") {
-            to = [managerEmail];
-            subject = "Offer Approved";
-            text = "Your offer has been approved.";
-        } else if (action === "decline") {
-            to = [managerEmail];
-            subject = "Offer Declined";
-            text = "Your offer has been declined.";
-        } else if (action === "delete") {
-            to = [managerEmail];
-            subject = "Offer Deleted";
-            text = "Your offer was deleted.";
-        } else if (action === "give") {
-            to = [managerEmail];
-            subject = "Points give";
-            text = "Your offer has been approved.";
-        } else if (action === "redeem") {
-            to = [managerEmail];
-            subject = "Points redeem";
-            text = "Your offer has been approved.";
-        }
-
+    const handleSendMail = async (action, managerEmail, companyEmail, companyName, managerName) => {
         try {
-            const response = await API.post("/send-mail", {
-                to,
-                subject,
-                text,
+            let companySubject = "";
+            let companyHtml = "";
+            let managerSubject = "";
+            let managerHtml = "";
+
+            if (action === "approve") {
+                companySubject = "🎉 Your Registration Has Been Approved!";
+                companyHtml = `
+                                    <h2>Hello ${companyName},</h2>
+                                    <p>We are pleased to inform you that your registration has been <strong>approved</strong> by our team.</p>
+                                    <p>Welcome aboard!</p>
+                                    <p>Regards,<br/>Team</p>
+                                `;
+
+                managerSubject = "✅ You Approved a company";
+                managerHtml = `
+                                    <h2>Hello ${managerName},</h2>
+                                    <p>Your company : <strong>${companyName} have approved.</strong>.</p>
+                                    <p>Thank you for your action.</p>
+                                `;
+            }
+
+            if (action === "decline") {
+                managerSubject = "❌ Your company has been Declined";
+                managerHtml = `
+                                    <h2>Hello ${managerName},</h2>
+                                    <p>company Name: <strong>${companyName}</strong>.</p>
+                                    <p>Please ensure the reason is communicated if needed.</p>
+                                `;
+            }
+
+            if (action === "delete") {
+                managerSubject = "🗑️ Your customer has been Deleted";
+                managerHtml = `
+                                    <h2>Hello ${managerName},</h2>
+                                    <p>company Name: <strong>${companyName}</strong>.</p>
+                                    <p>This action is now logged.</p>
+                                `;
+            }
+
+            // Send to company only if approved
+            if (action === "approve") {
+                await API.post("/send-mail", {
+                    to: [companyEmail],
+                    subject: companySubject,
+                    html: companyHtml
+                });
+            }
+
+            //Send to manager for all actions
+            await API.post("/send-mail", {
+                to: [managerEmail],
+                subject: managerSubject,
+                html: managerHtml
             });
 
-            toast.success(response.data.message);
+            toast.success("Mail sent successfully!");
         } catch (error) {
             console.error("Mail send error:", error);
             toast.error("Failed to send email");
@@ -194,20 +218,39 @@ const CompanyPage = () => {
 
                                         <td className="flex gap-2 px-4 py-3">
                                             <button
-                                                onClick={() => { approvecompany(company._id); handleSendMail("approve", lowermanager.email); }}
+                                                onClick={() => {
+                                                    approvecompany(company._id); handleSendMail("approve",
+                                                        company.managerEmail,
+                                                        company.email,
+                                                        company.name,
+                                                        company.manager,
+                                                    );
+                                                }}
                                                 className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                             >
                                                 <PencilLine size={16} /> Approve
                                             </button>
 
                                             <button
-                                                onClick={() => { declinecompany(company._id); handleSendMail("decline", lowermanager.email); }}
+                                                onClick={() => {
+                                                    declinecompany(company._id); handleSendMail("decline",
+                                                        company.managerEmail,
+                                                        company.email,
+                                                        company.name,
+                                                        company.manager,
+                                                    );
+                                                }}
                                                 className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Decline
                                             </button>
                                             <button
-                                                onClick={() => { softdeletecompany(company._id); handleSendMail("delete", lowermanager.email); }}
+                                                onClick={() => {
+                                                    softdeletecompany(company._id); handleSendMail("delete", company.name,
+                                                        company.email,
+                                                        company.managerEmail,
+                                                        company.manager,);
+                                                }}
                                                 className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete

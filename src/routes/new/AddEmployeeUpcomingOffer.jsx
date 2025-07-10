@@ -43,7 +43,8 @@ const AddEmployeeUpcomingoffer = () => {
                     ...data,
                     manager: lowermanager && lowermanager.firstname && lowermanager.lastname
                         ? `${lowermanager.firstname} ${lowermanager.lastname}`
-                        : 'Created by Super Manager / Admin'
+                        : 'Created by Super Manager / Admin',
+                    managerEmail: lowermanager ? lowermanager.email : null
                 },
                 {
                     headers: {

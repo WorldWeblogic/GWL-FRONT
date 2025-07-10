@@ -7,7 +7,8 @@ import API from "../../API/Api";
 import useOfferSync from "../../hooks/useOfferSync";
 
 const ManagerEmployee = () => {
-    const { employeedata, fetchallemployee, lowermanager } = useAuth();
+    const { employeedata, fetchallemployee } = useAuth();
+
     useOfferSync(fetchallemployee);
     const softdeleteemployee = async (id) => {
         try {
@@ -84,56 +85,65 @@ const ManagerEmployee = () => {
     };
 
 
-    const handleSendMail = async (action, managerEmail, employeeEmail) => {
-
-        let subject = "";
-        let html = "";
-        let to = [];
-
-        switch (action) {
-            case "approve":
-                to = [managerEmail, employeeEmail];
-                subject = "Employee Approved";
-                html = "<p>Your offer has been Approved.</p>";
-                break;
-
-            case "decline":
-                to = [managerEmail];
-                subject = "Employee Declined";
-                html = "<p>Your offer has been Declined.</p>";
-                break;
-
-            case "delete":
-                to = [managerEmail];
-                subject = "Employee Deleted";
-                html = "<p>Your offer has been Deleted.</p>";
-                break;
-
-            case "give":
-                to = [managerEmail, employeeEmail];
-                subject = "Points Given";
-                html = "<p>Points have been successfully credited.</p>";
-                break;
-
-            case "redeem":
-                to = [managerEmail, employeeEmail];
-                subject = "Points Redeemed";
-                html = "<p>Points have been successfully redeemed.</p>";
-                break;
-
-            default:
-                toast.error("Unknown email action type.");
-                return;
-        }
-
+    const handleSendMail = async (action, managerEmail, employeeEmail, employeeName, managerName) => {
         try {
-            const response = await API.post("/send-mail", {
-                to,
-                subject,
-                html,
+            let employeeSubject = "";
+            let employeeHtml = "";
+            let managerSubject = "";
+            let managerHtml = "";
+
+            if (action === "approve") {
+                employeeSubject = "🎉 Your Registration Has Been Approved!";
+                employeeHtml = `
+                            <h2>Hello ${employeeName},</h2>
+                            <p>We are pleased to inform you that your registration has been <strong>approved</strong> by our team.</p>
+                            <p>Welcome aboard!</p>
+                            <p>Regards,<br/>Team</p>
+                        `;
+
+                managerSubject = "✅ You Approved a Employee";
+                managerHtml = `
+                            <h2>Hello ${managerName},</h2>
+                            <p>Your Employee : <strong>${employeeName} have approved.</strong>.</p>
+                            <p>Thank you for your action.</p>
+                        `;
+            }
+
+            if (action === "decline") {
+                managerSubject = "❌ Your Employee has been Declined";
+                managerHtml = `
+                            <h2>Hello ${managerName},</h2>
+                            <p>Employee Name: <strong>${employeeName}</strong>.</p>
+                            <p>Please ensure the reason is communicated if needed.</p>
+                        `;
+            }
+
+            if (action === "delete") {
+                managerSubject = "🗑️ Your customer has been Deleted";
+                managerHtml = `
+                            <h2>Hello ${managerName},</h2>
+                            <p>Employee Name: <strong>${employeeName}</strong>.</p>
+                            <p>This action is now logged.</p>
+                        `;
+            }
+
+            // Send to employee only if approved
+            if (action === "approve") {
+                await API.post("/send-mail", {
+                    to: [employeeEmail],
+                    subject: employeeSubject,
+                    html: employeeHtml
+                });
+            }
+
+            // Send to manager for all actions
+            await API.post("/send-mail", {
+                to: [managerEmail],
+                subject: managerSubject,
+                html: managerHtml
             });
 
-            toast.success(response.data.message);
+            toast.success("Mail sent successfully!");
         } catch (error) {
             console.error("Mail send error:", error);
             toast.error("Failed to send email");
@@ -185,7 +195,12 @@ const ManagerEmployee = () => {
                                             <button
                                                 onClick={() => {
                                                     approveEmployee(employee._id);
-                                                    handleSendMail("approve", employee.managerEmail, employee.email);
+                                                    handleSendMail(
+                                                        "approve",
+                                                        employee.managerEmail,
+                                                        employee.email,
+                                                        `${employee.firstname} ${employee.lastname}`,
+                                                        employee.manager);
                                                 }}
                                                 className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                             >
@@ -195,7 +210,10 @@ const ManagerEmployee = () => {
                                             <button
                                                 onClick={() => {
                                                     declineEmployee(employee._id);
-                                                    handleSendMail("decline", employee.managerEmail);
+                                                    handleSendMail("decline",
+                                                        employee.managerEmail,
+                                                        employee.manager,
+                                                        `${employee.firstname} ${employee.lastname}`);
                                                 }}
                                                 className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                             >
@@ -204,7 +222,10 @@ const ManagerEmployee = () => {
                                             <button
                                                 onClick={() => {
                                                     softdeleteemployee(employee._id);
-                                                    handleSendMail("delete", employee.managerEmail);
+                                                    handleSendMail("delete",
+                                                        employee.managerEmail,
+                                                        employee.manager,
+                                                        `${employee.firstname}${employee.lastname}`);
                                                 }}
                                                 className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                                             >
