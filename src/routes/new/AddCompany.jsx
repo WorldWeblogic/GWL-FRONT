@@ -45,7 +45,7 @@ const AddCompany = () => {
         }
     };
 
-    const handleSubmit = async (e, company, superManagerEmail, lowermanagerName, lowermanagerEmail) => {
+    const handleSubmit = async (e, company, superManagerEmail) => {
         e.preventDefault();
 
         if (!data.name || !data.email || !data.phone || !data.companyaddress || !data.employeeid) {
@@ -86,19 +86,19 @@ const AddCompany = () => {
             setPdf1(null);
             getComId();
             getEmiratesID();
-            await handleSendMail(e, company, superManagerEmail, lowermanagerName, lowermanagerEmail);
+            await handleSendMail(e, company, superManagerEmail);
         } catch (err) {
             toast.error(err.response?.data?.message || "Error occurred");
         }
     };
 
-    const handleSendMail = async (e, company, superManagerEmail, lowermanagerName, lowermanagerEmail) => {
+    const handleSendMail = async (e, company, superManagerEmail) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required: Please Review New Company Add Request",
-                html: generateHtmlTemplate(company, lowermanagerName, lowermanagerEmail)
+                html: generateHtmlTemplate(company)
             });
 
             toast.success(response.data.message);
@@ -113,7 +113,7 @@ const AddCompany = () => {
         setEmiratesId(response.data.emetID);
     }
 
-    const generateHtmlTemplate = (company, lowermanagerName, lowermanagerEmail) => {
+    const generateHtmlTemplate = (company) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -159,8 +159,8 @@ const AddCompany = () => {
         <p>Dear Super Manager,</p>
         <p>
           A new company has been added by <br>
-          <strong>Manager Name :</strong> ${lowermanagerName} <br>
-          <strong>Manager Email : </strong>${lowermanagerEmail} and requires your action.
+          <strong>Manager Name :</strong> ${lowermanager.firstname} ${lowermanager.lastname} <br>
+          <strong>Manager Email : </strong>${lowermanager.email} and requires your action.
         </p>
         <p><strong>Company ID:</strong> ${company.companyId} <br>
         <strong>Company Name:</strong> ${company.name} </p>
@@ -281,7 +281,7 @@ const AddCompany = () => {
 
                     <div className="mt-6">
                         <button
-                            onClick={(e) => { handleSubmit(e, data, managerdata[0]?.email, companydata[0].manager, companydata[0].managerEmail) }}
+                            onClick={(e) => { handleSubmit(e, data, managerdata[0]?.email) }}
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                         >
                             Submit

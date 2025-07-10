@@ -167,7 +167,7 @@ const LowerManagerEmployee = () => {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={() => { rejectEmp(employee._id, employee, managerdata[0]?.email, employeedata[0]?.manager, employeedata[0]?.managerEmail) }}
+                                                onClick={() => { rejectEmp(employee._id, employee, managerdata[0]?.email, employee.manager, employee.managerEmail) }}
                                                 className="flex items-center gap-1 rounded bg-red-500 px-3 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete

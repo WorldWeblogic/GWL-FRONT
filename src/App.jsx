@@ -447,13 +447,15 @@ function App() {
                     path: "/Managerlayout/edit-customer", element: (
                         <ManagerRoute>
                             <ManagerCustomer />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 {
                     path: "/Managerlayout/add-customer", element: (
                         <ManagerRoute>
                             <AddcustomerPage />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 {
                     path: "/Managerlayout/manage-customer", element: (
@@ -466,52 +468,60 @@ function App() {
                     path: "/Managerlayout/all-customer", element: (
                         <ManagerRoute>
                             <Allcustomer />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 // relation
                 {
                     path: "/Managerlayout/relation", element: (
                         <ManagerRoute>
                             <Relation />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 // company
                 {
                     path: "/Managerlayout/edit-company", element: (
                         <ManagerRoute>
                             <CompanyPage />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 {
                     path: "/Managerlayout/add-company", element: (
                         <ManagerRoute>
                             <AddCompany />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 {
                     path: "/Managerlayout/update-company", element: (
                         <ManagerRoute>
                             <UpdateCompany />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 {
                     path: "/Managerlayout/all-company", element: (
                         <ManagerRoute>
                             <Allcompany />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 // employee
                 {
                     path: "/Managerlayout/edit-employee", element: (
                         <ManagerRoute>
                             <ManagerEmployee />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 {
                     path: "/Managerlayout/add-employee", element: (
                         <ManagerRoute>
                             <AddemployeePage />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 {
                     path: "/Managerlayout/update-employee", element: (
@@ -523,7 +533,8 @@ function App() {
                     path: "/Managerlayout/all-employee", element: (
                         <ManagerRoute>
                             <Allemployee />
-                        </ManagerRoute>)
+                        </ManagerRoute>
+                    )
                 },
                 {
                     path: "/Managerlayout/leaderboard", element: (
@@ -602,7 +613,8 @@ function App() {
                     path: "/layout/edit-customer", element: (
                         <AdminRoute>
                             <EditCustomerPage />
-                        </AdminRoute>)
+                        </AdminRoute>
+                    )
                 },
                 {
                     path: "/layout/update-customer", element: (

@@ -153,7 +153,7 @@ const LowerManagerCustomer = () => {
                                                 </button>
                                             </Link>
                                             <button
-                                                onClick={() => { rejectCustomer(customer._id, managerdata[0]?.email, customer, customersdata[0]?.manager, customersdata[0]?.managerEmail) }}
+                                                onClick={() => { rejectCustomer(customer._id, managerdata[0]?.email, customer, customer.manager, customer.managerEmail) }}
                                                 className="my-1 flex items-center gap-1 rounded bg-red-500 px-3 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Delete

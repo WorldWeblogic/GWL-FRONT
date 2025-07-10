@@ -171,10 +171,14 @@ const LowerManagerAllupcomingoffer = () => {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="font-medium text-slate-900 dark:text-slate-50 px-4 py-3">{customer.offerid}</td>
-                                    <td className="font-medium text-slate-900 dark:text-slate-50 px-4 py-3">{customer.startDate.slice(0, 10).split("-").reverse().join("-")}</td>
-                                    <td className="font-medium text-slate-900 dark:text-slate-50 px-4 py-3">{customer.endDate.slice(0, 10).split("-").reverse().join("-")}</td>
-                                    <td className="font-medium text-slate-900 dark:text-slate-50 px-4 py-3">{customer.status}</td>
+                                    <td className="font-medium text-slate-900 dark:text-slate-50 px-4 py-3">{customer.offerid}
+                                    </td>
+                                    <td className="font-medium text-slate-900 dark:text-slate-50 px-4 py-3">{customer.startDate.slice(0, 10).split("-").reverse().join("-")}
+                                    </td>
+                                    <td className="font-medium text-slate-900 dark:text-slate-50 px-4 py-3">{customer.endDate.slice(0, 10).split("-").reverse().join("-")}
+                                    </td>
+                                    <td className="font-medium text-slate-900 dark:text-slate-50 px-4 py-3">{customer.status}
+                                    </td>
                                     <td className="px-4 py-3 flex gap-2">
                                         <Link to={"/LowerManagerlayout/edit-upcomingoffers"}
                                             state={{ LManagerCustUpOffer: customer._id }}

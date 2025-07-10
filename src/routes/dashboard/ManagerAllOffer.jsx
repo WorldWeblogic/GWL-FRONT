@@ -115,37 +115,51 @@ const ManagerAllOffers = () => {
         }));
     };
 
-    const handleSendMail = async (action) => {
-    let subject = "";
-    let text = "";
-    let to = [];
+    const handleSendMail = async (action, managerEmail, managerName, offerName, offerDescription) => {
+        try {
+            let managerSubject = "";
+            let managerHtml = "";
 
-    if (action === "approve") {
-        to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Offer Approved";
-        text = "Your offer has been approved."; 
-    } else if (action === "decline") {
-        to = ["shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Offer Declined";
-        text = "Your offer has been declined.";
-    } else if (action === "delete") {
-        to = ["shantanu.kr.worldweblogic@gmail.com"];
-        subject = "Offer Deleted";
-        text = "Your offer was deleted.";
-    }
-    try {
-        const response = await API.post("/send-mail", {
-            to,
-            subject,
-            text,
-        });
+            if (action === "approve") {
+                managerSubject = "✅ You Approved a offer";
+                managerHtml = `
+                                    <h2>Hello ${managerName},</h2>
+                                    <p>Your offer: title <strong>${offerName} description <strong>${offerDescription}</strong> have approved.</strong>.</p>
+                                    <p>Thank you for your action.</p>
+                                `;
+            }
 
-        toast.success(response.data.message);
-    } catch (error) {
-        console.error("Mail send error:", error);
-        toast.error("Failed to send email");
-    }
-};
+            if (action === "decline") {
+                managerSubject = "❌ Your offer has been Declined";
+                managerHtml = `
+                                    <h2>Hello ${managerName},</h2>
+                                    <p>Your offer: title <strong>${offerName} description <strong>${offerDescription}</strong> have declined.</strong>.</p>
+                                    <p>Thank you for your action.</p>
+                                `;
+            }
+
+            if (action === "delete") {
+                managerSubject = "🗑️ Your offer has been Deleted";
+                managerHtml = `
+                                    <h2>Hello ${managerName},</h2>
+                                    <p>Your offer: title <strong>${offerName} description <strong>${offerDescription}</strong> have approved.</strong>.</p>
+                                    <p>Thank you for your action.</p>
+                                `;
+            }
+
+            //Send to manager for all actions
+            await API.post("/send-mail", {
+                to: [managerEmail],
+                subject: managerSubject,
+                html: managerHtml,
+            });
+
+            toast.success("Mail sent successfully!");
+        } catch (error) {
+            console.error("Mail send error:", error);
+            toast.error("Failed to send email");
+        }
+    };
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Customer Offers</h1>
@@ -205,7 +219,13 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 approveoffer(customer._id);
-                                                handleSendMail("approve");
+                                                handleSendMail(
+                                                    "approve",
+                                                    customer.managerEmail,
+                                                    customer.manager,
+                                                    customer.offerTitle,
+                                                    customer.offerDescription,
+                                                );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                         >
@@ -214,7 +234,13 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 declineoffer(customer._id);
-                                                handleSendMail("decline");
+                                                handleSendMail(
+                                                    "decline",
+                                                    customer.managerEmail,
+                                                    customer.manager,
+                                                    customer.offerTitle,
+                                                    customer.offerDescription,
+                                                );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                         >
@@ -223,7 +249,13 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 softdeleteoffer(customer._id);
-                                                handleSendMail("delete");
+                                                handleSendMail(
+                                                    "delete",
+                                                    customer.managerEmail,
+                                                    customer.manager,
+                                                    customer.offerTitle,
+                                                    customer.offerDescription,
+                                                );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                                         >
@@ -294,7 +326,13 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 approveemployeeoffer(customer._id);
-                                                handleSendMail("approve");
+                                                handleSendMail(
+                                                    "approve",
+                                                    customer.managerEmail,
+                                                    customer.manager,
+                                                    customer.offerTitle,
+                                                    customer.offerDescription,
+                                                );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                         >
@@ -304,7 +342,13 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 declineemployeeoffer(customer._id);
-                                                handleSendMail("decline");
+                                                handleSendMail(
+                                                    "decline",
+                                                    customer.managerEmail,
+                                                    customer.manager,
+                                                    customer.offerTitle,
+                                                    customer.offerDescription,
+                                                );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                         >
@@ -313,7 +357,13 @@ const ManagerAllOffers = () => {
                                         <button
                                             onClick={() => {
                                                 softdeleteemloyeeoffer(customer._id);
-                                                handleSendMail("delete");
+                                                handleSendMail(
+                                                    "delete",
+                                                    customer.managerEmail,
+                                                    customer.manager,
+                                                    customer.offerTitle,
+                                                    customer.offerDescription,
+                                                );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                                         >

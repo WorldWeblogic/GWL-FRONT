@@ -13,7 +13,7 @@ const LowerManagerCompanyPage = () => {
     const { companydata, fetchallcompany, managerdata } = useAuth()
     useOfferSync(fetchallcompany);
 
-    const softdeletecompany = async (id, company, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const softdeletecompany = async (id, company, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
         try {
             await API.put(
                 `/deletecompany/${id}`,
@@ -22,19 +22,19 @@ const LowerManagerCompanyPage = () => {
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
             toast.success('Delete company request send to supermanager Successfully!');
-            await handleSendMail(company, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
+            await handleSendMail(company, superManagerEmail, lowerManagerName, lowerManagerEmail);
         } catch (err) {
             const message = "deletion failed";
             toast.error(message);
             console.error("delete error:", err);
         }
     }
-    const handleSendMail = async (company, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const handleSendMail = async (company, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required: Please Review Company",
-                html: generateHtmlTemplate(company, lowerManagerFirstName, lowerManagerLastName)
+                html: generateHtmlTemplate(company, lowerManagerName, lowerManagerEmail)
             });
 
             toast.success(response.data.message);
@@ -104,6 +104,9 @@ const LowerManagerCompanyPage = () => {
 </html>
   `;
     };
+
+
+    console.log(companydata);
 
 
     return (
@@ -177,7 +180,7 @@ const LowerManagerCompanyPage = () => {
                                                     <PencilLine size={16} /> Manage
                                                 </button>
                                             </Link>
-                                            <button onClick={() => { softdeletecompany(company._id, company, managerdata[0]?.email, companydata[0]?.manager, companydata[0]?.managerEmail) }}
+                                            <button onClick={() => { softdeletecompany(company._id, company, managerdata[0]?.email, company.manager, company.managerEmail) }}
                                                 className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded">
                                                 <Trash size={16} /> Delete
                                             </button>
