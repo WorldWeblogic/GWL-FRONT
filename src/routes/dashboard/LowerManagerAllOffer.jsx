@@ -9,21 +9,21 @@ import API from "../../API/Api";
 import useOfferSync from "../../hooks/useOfferSync";
 
 const LowerManagerAllOffers = () => {
-    const { offerdata, fetchalloffer, employeeofferdata, fetchallemployeeoffer, lowermanager, managerdata } = useAuth()
+    const { offerdata, fetchalloffer, employeeofferdata, fetchallemployeeoffer, managerdata } = useAuth()
     const [expandedOffers, setExpandedOffers] = useState({});
     useOfferSync(fetchalloffer, fetchallemployeeoffer);
 
-    const deleteoffer = async (id, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const deleteoffer = async (offer, superManagerEmail) => {
 
         try {
             await API.put(
-                `/decline-offer/${id}`  // no request body
+                `/decline-offer/${offer._id}`  // no request body
             );
             toast.success('offer deleted Successfully!');
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            await handleSendMail(offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
+            await handleSendMail(offer, superManagerEmail)
         } catch (err) {
             const message = err.response?.data?.message || "rejection failed";
             toast.error(message);
@@ -31,16 +31,17 @@ const LowerManagerAllOffers = () => {
         }
     };
 
-    const softdeleteemloyeeoffer = async (id, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+
+    const softdeleteemloyeeoffer = async (offer, superManagerEmail) => {
         try {
             await API.put(
-                `/decline-employee-offer/${id}`
+                `/decline-employee-offer/${offer._id}`
             );
             toast.success('employee offer deleted notification send to supermanager Successfully!');
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
-            await handleSendMail(offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
+            await handleSendMail(offer, superManagerEmail);
         } catch (err) {
             const message = err.response?.data?.message || "deletion failed";
             toast.error(message);
@@ -56,12 +57,12 @@ const LowerManagerAllOffers = () => {
         }));
     };
 
-    const handleSendMail = async (offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const handleSendMail = async (offer, superManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required: Please Review New Offer Add Request",
-                html: generateHtmlTemplate(offer, lowerManagerFirstName, lowerManagerLastName)
+                html: generateHtmlTemplate(offer)
             });
 
             toast.success(response.data.message);
@@ -71,7 +72,7 @@ const LowerManagerAllOffers = () => {
         }
     };
 
-    const generateHtmlTemplate = (offer, lowerManagerFirstName, lowerManagerLastName) => {
+    const generateHtmlTemplate = (offer) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -117,7 +118,8 @@ const LowerManagerAllOffers = () => {
         <p>Dear Super Manager,</p>
         <p>
           A Offer has been deleted by 
-          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+          <strong>${offer.manager}</strong><br>
+          <strong> Manager Email : </strong>${offer.managerEmail} and requires your action.
         </p>
         <p><strong>Offer Id:</strong>${offer.offerid}</p>
         <p><strong>Offer Name:</strong> ${offer.offerTitle}</p>
@@ -130,6 +132,7 @@ const LowerManagerAllOffers = () => {
 </html>
   `;
     };
+
 
     return (
         <div className="flex flex-col gap-y-4 p-6 min-h-screen">
@@ -187,8 +190,7 @@ const LowerManagerAllOffers = () => {
                                                 <PencilLine size={16} /> Manage
                                             </button></Link>
                                         <button onClick={() => {
-                                            deleteoffer(customer._id,
-                                                customer, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname
+                                            deleteoffer(customer, managerdata[0]?.email
                                             )
                                         }}
                                             className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">
@@ -201,6 +203,7 @@ const LowerManagerAllOffers = () => {
                     </table>
                 </div>
             </div>
+
             {/* employee offer */}
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Employee Offers</h1>
             <div className="bg-white dark:bg-slate-900 shadow rounded-xl p-4">
@@ -255,8 +258,7 @@ const LowerManagerAllOffers = () => {
                                                 <PencilLine size={16} /> Manage
                                             </button></Link>
                                         <button onClick={() => {
-                                            softdeleteemloyeeoffer(customer._id,
-                                                customer, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname
+                                            softdeleteemloyeeoffer(customer, managerdata[0]?.email
                                             )
                                         }}
                                             className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">

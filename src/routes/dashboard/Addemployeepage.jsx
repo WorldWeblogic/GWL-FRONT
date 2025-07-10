@@ -29,7 +29,7 @@ const AddemployeePage = () => {
     }
 
 
-    const handlesubmit = async (e, employee, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
+    const handlesubmit = async (e, employee, superManagerEmail) => {
         e.preventDefault();
         try {
             await API.post(
@@ -59,7 +59,7 @@ const AddemployeePage = () => {
             });
             await fetchallemployee();
             toast.success("employee added successfully !");
-            await handleSendMail(e, employee, superManagerEmail, lowerManagerName, lowerManagerEmail);
+            await handleSendMail(e, employee, superManagerEmail);
         } catch (err) {
             const message = err.response.data.message || "adding employee failed";
             toast.error(message);
@@ -85,13 +85,13 @@ const AddemployeePage = () => {
         getEmpId();
     }, [])
 
-    const handleSendMail = async (e, employee, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
+    const handleSendMail = async (e, employee, superManagerEmail) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required: Please Review Employee",
-                html: generateHtmlTemplate(employee, lowerManagerName, lowerManagerEmail)
+                html: generateHtmlTemplate(employee)
             });
 
             toast.success(response.data.message);
@@ -101,7 +101,7 @@ const AddemployeePage = () => {
         }
     };
 
-    const generateHtmlTemplate = (employee, lowerManagerName, lowerManagerEmail) => {
+    const generateHtmlTemplate = (employee) => {
         return `
  <!DOCTYPE html>
 <html>
@@ -147,8 +147,8 @@ const AddemployeePage = () => {
         <p>Dear Super Manager,</p>
         <p>
           A new Employee has been added by <br>
-          <strong>Manager Name : </strong> ${lowerManagerName} <br>
-          <strong>Manager Email : </strong>${lowerManagerEmail} and requires your action.
+          <strong>Manager Name : </strong> ${lowermanager.firstname} ${lowermanager.lastname} <br>
+          <strong>Manager Email : </strong>${lowermanager.email} and requires your action.
         </p>
         <p><strong>Employee ID : </strong> ${employee.employeeid} <br>
         <strong>Employee Name : </strong> ${employee.firstname} ${employee.lastname} <br>
@@ -258,7 +258,7 @@ const AddemployeePage = () => {
                     <div className="mt-6">
                         <button
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
-                            onClick={(e) => { handlesubmit(e, data, managerdata[0]?.email, employeedata[0]?.manager, employeedata[0]?.managerEmail) }}
+                            onClick={(e) => { handlesubmit(e, data, managerdata[0]?.email) }}
                         >
                             Submit
                         </button>

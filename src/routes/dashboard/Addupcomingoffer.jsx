@@ -6,7 +6,7 @@ import { useEffect } from "react"
 import API from "../../API/Api";
 
 const Addupcomingoffer = () => {
-    const { fetchupcomingalloffer, lowermanager, managerdata } = useAuth();
+    const { fetchupcomingalloffer, lowermanager, managerdata, Upcomimgofferdata } = useAuth();
     const [data, setdata] = useState({
         offerTitle: "",
         offerDescription: "",
@@ -14,6 +14,7 @@ const Addupcomingoffer = () => {
         endDate: "",
         offerid: "",
     });
+
 
     const today = new Date().toISOString().split('T')[0];
     const handleChange = (e) => {
@@ -46,6 +47,7 @@ const Addupcomingoffer = () => {
                         lowermanager && lowermanager.firstname && lowermanager.lastname
                             ? `${lowermanager.firstname} ${lowermanager.lastname}`
                             : "Created by Super Manager / Admin",
+                    managerEmail: lowermanager.email
                 },
                 {
                     headers: {

@@ -98,13 +98,13 @@ const ManagerEmployee = () => {
                 break;
 
             case "decline":
-                to = [managerEmail, employeeEmail];
+                to = [managerEmail];
                 subject = "Employee Declined";
                 html = "<p>Your offer has been Declined.</p>";
                 break;
 
             case "delete":
-                to = [managerEmail, employeeEmail];
+                to = [managerEmail];
                 subject = "Employee Deleted";
                 html = "<p>Your offer has been Deleted.</p>";
                 break;

@@ -6,37 +6,25 @@ import API from "../../API/Api";
 import useOfferSync from "../../hooks/useOfferSync";
 
 const ManagerCustomer = () => {
-    const { customersdata, fetchalluser } = useAuth()
+    const { customersdata, fetchalluser } = useAuth();
     useOfferSync(fetchalluser);
+
     const softdeleteCustomer = async (id) => {
         try {
-            await API.patch(
-                `/deleteuser/${id}`,
-                null,
-            );
-            const bc = new BroadcastChannel("offer_status_channel");
-            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
-            bc.close();
+            await API.patch(`/deleteuser/${id}`, null);
+            broadcastUpdate();
             toast.success('Customer deleted Successfully!');
         } catch (err) {
             const message = err.response?.data?.message || "deletion failed";
             toast.error(message);
             console.error(err);
         }
-    }
+    };
 
-
-
-
-    // approve customer
     const approveCustomer = async (id) => {
         try {
-            const response = await API.put(
-                `/approvecustomer/${id}`
-            );
-            const bc = new BroadcastChannel("offer_status_channel");
-            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
-            bc.close();
+            const response = await API.put(`/approvecustomer/${id}`);
+            broadcastUpdate();
             toast.success(response.data.message);
         } catch (err) {
             const errorMessage = err.response?.data?.message || "Approve failed";
@@ -44,55 +32,89 @@ const ManagerCustomer = () => {
             console.error(err);
         }
     };
+
     const declineCustomer = async (id) => {
         try {
-            const response = await API.put(
-                `/rejectcustomer/${id}`
-            );
-            const bc = new BroadcastChannel("offer_status_channel");
-            bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
-            bc.close(); // or your function to refresh customer list
-            toast.success(response.data.message); // Show success message from backend
+            const response = await API.put(`/rejectcustomer/${id}`);
+            broadcastUpdate();
+            toast.success(response.data.message);
         } catch (err) {
-            const errorMessage = err.response?.data?.message || "Delete failed";
+            const errorMessage = err.response?.data?.message || "Decline failed";
             toast.error(errorMessage);
             console.error(err);
         }
     };
 
-    const handleSendMail = async (action) => {
-        let subject = "";
-        let text = "";
-        let to = [];
+    const broadcastUpdate = () => {
+        const bc = new BroadcastChannel("offer_status_channel");
+        bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
+        bc.close();
+    };
 
-        if (action === "approve") {
-            to = ["skr36880@gmail.com", "shantanu.kr.worldweblogic@gmail.com"];
-            subject = "Offer Approved";
-            text = "Your offer has been approved.";
-        } else if (action === "decline") {
-            to = ["shantanu.kr.worldweblogic@gmail.com"];
-            subject = "Offer Declined";
-            text = "Your offer has been declined.";
-        } else if (action === "delete") {
-            to = ["shantanu.kr.worldweblogic@gmail.com"];
-            subject = "Offer Deleted";
-            text = "Your offer was deleted.";
-        }
-
+    const handleSendMail = async (action, customerEmail, managerEmail, customerName, managerName) => {
         try {
-            const response = await API.post("/send-mail", {
-                to,
-                subject,
-                text,
+            let customerSubject = "";
+            let customerHtml = "";
+            let managerSubject = "";
+            let managerHtml = "";
+
+            if (action === "approve") {
+                customerSubject = "🎉 Your Registration Has Been Approved!";
+                customerHtml = `
+                    <h2>Hello ${customerName},</h2>
+                    <p>We are pleased to inform you that your registration has been <strong>approved</strong> by our team.</p>
+                    <p>Welcome aboard!</p>
+                    <p>Regards,<br/>Team</p>
+                `;
+
+                managerSubject = "✅ You Approved a Customer";
+                managerHtml = `
+                    <h2>Hello ${managerName},</h2>
+                    <p>Your Customer : <strong>${customerName} have approved.</strong>.</p>
+                    <p>Thank you for your action.</p>
+                `;
+            }
+
+            if (action === "decline") {
+                managerSubject = "❌ Your Customer has been Declined";
+                managerHtml = `
+                    <h2>Hello ${managerName},</h2>
+                    <p>Customer Name: <strong>${customerName}</strong>.</p>
+                    <p>Please ensure the reason is communicated if needed.</p>
+                `;
+            }
+
+            if (action === "delete") {
+                managerSubject = "🗑️ Your customer has been Deleted";
+                managerHtml = `
+                    <h2>Hello ${managerName},</h2>
+                    <p>Customer Name: <strong>${customerName}</strong>.</p>
+                    <p>This action is now logged.</p>
+                `;
+            }
+
+            // Send to customer only if approved
+            if (action === "approve") {
+                await API.post("/send-mail", {
+                    to: [customerEmail],
+                    subject: customerSubject,
+                    html: customerHtml
+                });
+            }
+
+            // Send to manager for all actions
+            await API.post("/send-mail", {
+                to: [managerEmail],
+                subject: managerSubject,
+                html: managerHtml
             });
 
-            toast.success(response.data.message);
+            toast.success("Mail sent successfully!");
         } catch (error) {
             console.error("Mail send error:", error);
             toast.error("Failed to send email");
         }
     };
-
 
     return (
         <div className="flex flex-col gap-y-4 p-6 min-h-screen">
@@ -120,23 +142,55 @@ const ManagerCustomer = () => {
                                 {customersdata.map((customer, index) => (
                                     <tr key={index}>
                                         <td className="px-4 py-3 dark:text-white">{index + 1}</td>
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center gap-3">
-                                                <span className="dark:text-white">{customer.firstname}{" "}{customer.lastname}</span>
-                                            </div>
-                                        </td>
+                                        <td className="px-4 py-3 dark:text-white">{customer.firstname} {customer.lastname}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.email}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.customerid}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.manager}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.status}</td>
                                         <td className="px-4 py-3 flex gap-2">
-                                            <button onClick={() => { approveCustomer(customer._id); handleSendMail("approve") }} className="flex items-center gap-1 px-3 py-1 bg-green-500 text-white rounded my-2">
+                                            <button
+                                                onClick={() => {
+                                                    approveCustomer(customer._id);
+                                                    handleSendMail(
+                                                        "approve",
+                                                        customer.email,
+                                                        customer.managerEmail,
+                                                        `${customer.firstname} ${customer.lastname}`,
+                                                        customer.manager
+                                                    );
+                                                }}
+                                                className="flex items-center gap-1 px-3 py-1 bg-green-500 text-white rounded my-2"
+                                            >
                                                 <Trash size={16} /> Approve
                                             </button>
-                                            <button onClick={() => { declineCustomer(customer._id); handleSendMail("decline") }} className="flex items-center gap-1 px-4 py-1 bg-orange-500 text-white rounded my-2">
+                                            <button
+                                                onClick={() => {
+                                                    declineCustomer(customer._id);
+                                                    handleSendMail(
+                                                        "decline",
+                                                        customer.email,
+                                                        customer.managerEmail,
+                                                        `${customer.firstname} ${customer.lastname}`,
+                                                        customer.manager
+                                                    );
+                                                }}
+                                                className="flex items-center gap-1 px-4 py-1 bg-orange-500 text-white rounded my-2"
+                                            >
                                                 <Trash size={16} /> Decline
                                             </button>
-                                            <button onClick={() => { softdeleteCustomer(customer._id); handleSendMail("delete"); }} className="flex items-center gap-1 px-4 py-1 bg-red-500 text-white rounded my-2">
+                                            <button
+                                                onClick={() => {
+                                                    softdeleteCustomer(customer._id);
+                                                    handleSendMail(
+                                                        "delete",
+                                                        customer.email,
+                                                        customer.managerEmail,
+                                                        `${customer.firstname} ${customer.lastname}`,
+                                                        customer.manager
+                                                    );
+                                                }}
+                                                className="flex items-center gap-1 px-4 py-1 bg-red-500 text-white rounded my-2"
+                                            >
                                                 <Trash size={16} /> Delete
                                             </button>
                                         </td>
@@ -146,7 +200,6 @@ const ManagerCustomer = () => {
                         </table>
                     </div>
                 </div>
-
             </div>
             <Footer />
         </div>
@@ -154,6 +207,3 @@ const ManagerCustomer = () => {
 };
 
 export default ManagerCustomer;
-
-
-

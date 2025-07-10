@@ -35,7 +35,7 @@ const AddOffers = () => {
         });
     };
 
-    const handlesubmit = async (e, offer, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
+    const handlesubmit = async (e, offer, superManagerEmail) => {
         e.preventDefault();
         try {
             await API.post(
@@ -64,7 +64,7 @@ const AddOffers = () => {
             });
             await fetchalloffer();
             toast.success("Adding offer notification send for approval send to super manager!");
-            await handleSendMail(e, offer, superManagerEmail, lowerManagerName, lowerManagerEmail);
+            await handleSendMail(e, offer, superManagerEmail);
         } catch (err) {
             const message = "offer created failed";
             toast.error(message);
@@ -91,13 +91,13 @@ const AddOffers = () => {
         getLastOfferId();
     }, [])
 
-    const handleSendMail = async (e, offer, superManagerEmail, lowerManagerName, lowerManagerEmail) => {
+    const handleSendMail = async (e, offer, superManagerEmail) => {
         e.preventDefault();
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Adding customer offer came for Approval",
-                html: generateHtmlTemplate(offer, lowerManagerName, lowerManagerEmail)
+                html: generateHtmlTemplate(offer)
             });
 
             toast.success(response.data.message);
@@ -107,7 +107,7 @@ const AddOffers = () => {
         }
     };
 
-    const generateHtmlTemplate = (offer, lowerManagerName, lowerManagerEmail) => {
+    const generateHtmlTemplate = (offer) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -153,8 +153,8 @@ const AddOffers = () => {
         <p>Dear Super Manager,</p>
         <p>
           A new Offer has been added by <br>
-          <strong>Manager Name :</strong> ${lowerManagerName} <br>
-          <strong>Manager Email : </strong>${lowerManagerEmail} and requires your action.
+          <strong>Manager Name :</strong> ${lowermanager.firstname} ${lowermanager.lastname} <br>
+          <strong>Manager Email : </strong>${lowermanager.email} and requires your action.
         </p>
         <p><strong>Offer ID:</strong> ${offer.offerid} <br>
         <strong>Offer Name:</strong> ${offer.offerTitle} </p>
@@ -248,7 +248,7 @@ const AddOffers = () => {
                         <button
                             onClick={(e) => {
                                 handlesubmit(e,
-                                    data, managerdata[0]?.email, offerdata[0]?.manager, offerdata[0]?.managerEmail,)
+                                    data, managerdata[0]?.email)
                             }}
                             type="submit"
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
