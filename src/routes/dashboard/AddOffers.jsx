@@ -6,7 +6,8 @@ import { useEffect } from "react";
 import API from "../../API/Api";
 
 const AddOffers = () => {
-    const { fetchalloffer, lowermanager, managerdata, offerdata } = useAuth();
+    const { fetchalloffer, lowermanager, managerdata } = useAuth();
+    const lowermanagersession = sessionStorage.getItem("lowermanagerid");
     const [data, setdata] = useState({
         offerTitle: "",
         offerDescription: "",
@@ -46,7 +47,7 @@ const AddOffers = () => {
                         lowermanager && lowermanager.firstname && lowermanager.lastname
                             ? `${lowermanager.firstname} ${lowermanager.lastname}`
                             : "Created by Super Manager / Admin",
-                    managerEmail: lowermanager.email
+                    managerEmail: lowermanager ? lowermanager.email : null
                 },
                 {
                     headers: {
@@ -64,7 +65,7 @@ const AddOffers = () => {
             });
             await fetchalloffer();
             toast.success("Adding offer notification send for approval send to super manager!");
-            await handleSendMail(e, offer, superManagerEmail);
+            lowermanagersession ? await handleSendMail(offer, superManagerEmail) : null
         } catch (err) {
             const message = "offer created failed";
             toast.error(message);
@@ -91,8 +92,7 @@ const AddOffers = () => {
         getLastOfferId();
     }, [])
 
-    const handleSendMail = async (e, offer, superManagerEmail) => {
-        e.preventDefault();
+    const handleSendMail = async (offer, superManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],

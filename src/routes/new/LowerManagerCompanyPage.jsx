@@ -106,9 +106,6 @@ const LowerManagerCompanyPage = () => {
     };
 
 
-    console.log(companydata);
-
-
     return (
         <div className="flex flex-col gap-y-4 p-6 min-h-screen">
             <div>

@@ -111,35 +111,119 @@ const Allupcomingoffer = () => {
         }));
     };
 
-    const handleSendMail = async (action, managerEmail, managerName, offerName, offerDescription) => {
+    const handleSendMail = async (action, managerEmail, managerName, offerName, offerDescription, offerid, offerType) => {
         try {
             let managerSubject = "";
             let managerHtml = "";
+            const typeLabel = offerType === "Customer" ? "Customer" : "Employee";
 
             if (action === "approve") {
-                managerSubject = "✅ You Approved a offer";
+                managerSubject = `You ${typeLabel} upcoming Offer has been Approved.`;
                 managerHtml = `
-                                    <h2>Hello ${managerName},</h2>
-                                    <p>Your offer: title <strong>${offerName} description <strong>${offerDescription}</strong> have approved.</strong>.</p>
-                                    <p>Thank you for your action.</p>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <tr>
+          <td style="background:#2f67bd;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+            Upcoming Offer Approved
+            </h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
+
+            <p style="margin:0 0 12px 0;">
+            Your ${typeLabel} upcoming offer has been approved. <br>
+              <strong> Offer Id : </strong>${offerid} <br>
+               <strong>Offer Name : </strong>${offerName}<br>
+            <strong>  Offer Description : </strong> ${offerDescription}
+            </p>
+
+            <p style="margin:0;">Thank you for your action.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
                                 `;
             }
 
             if (action === "decline") {
-                managerSubject = "❌ Your offer has been Declined";
+                managerSubject = `Your ${typeLabel} upcoming offer has been declined.`;
                 managerHtml = `
-                                    <h2>Hello ${managerName},</h2>
-                                    <p>Your offer: title <strong>${offerName} description <strong>${offerDescription}</strong> have declined.</strong>.</p>
-                                    <p>Thank you for your action.</p>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <tr>
+          <td style="background:#e74c3c;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+             Upcoming Offer Declined
+            </h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
+
+           <p style="margin:0 0 12px 0;">
+            Your ${typeLabel} upcoming offer has been declined.<br>
+              <strong> Offer Id : </strong>${offerid} <br>
+               <strong>Offer Name : </strong>${offerName}
+            </p>
+            <p style="margin:0;">Thank you for your action.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
                                 `;
             }
 
             if (action === "delete") {
-                managerSubject = "🗑️ Your offer has been Deleted";
+                managerSubject = `Your ${typeLabel} upcoming offer has been deleted.`;
                 managerHtml = `
-                                    <h2>Hello ${managerName},</h2>
-                                    <p>Your offer: title <strong>${offerName} description <strong>${offerDescription}</strong> have approved.</strong>.</p>
-                                    <p>Thank you for your action.</p>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <tr>
+          <td style="background:#e74c3c;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+             Upcoming Offer Deleted
+            </h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
+          <p style="margin:0 0 12px 0;">
+           Your ${typeLabel} upcoming offer has been deleted.<br>
+              <strong> Offer Id : </strong>${offerid} <br>
+               <strong>Offer Name : </strong>${offerName}<br>
+            <strong>  Offer Description : </strong> ${offerDescription} 
+            </p>
+            <p style="margin:0;">Thank you for your action.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
                                 `;
             }
 
@@ -222,6 +306,8 @@ const Allupcomingoffer = () => {
                                                     customer.manager,
                                                     customer.offerTitle,
                                                     customer.offerDescription,
+                                                    customer.offerid,
+                                                    "Customer"
                                                 );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
@@ -237,6 +323,8 @@ const Allupcomingoffer = () => {
                                                     customer.manager,
                                                     customer.offerTitle,
                                                     customer.offerDescription,
+                                                    customer.offerid,
+                                                    "Customer"
                                                 );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
@@ -252,6 +340,8 @@ const Allupcomingoffer = () => {
                                                     customer.manager,
                                                     customer.offerTitle,
                                                     customer.offerDescription,
+                                                    customer.offerid,
+                                                    "Customer"
                                                 );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
@@ -330,6 +420,8 @@ const Allupcomingoffer = () => {
                                                     customer.manager,
                                                     customer.offerTitle,
                                                     customer.offerDescription,
+                                                    customer.offerid,
+                                                    "Employee"
                                                 );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-green-500 px-4 py-1 text-white"
@@ -345,6 +437,8 @@ const Allupcomingoffer = () => {
                                                     customer.manager,
                                                     customer.offerTitle,
                                                     customer.offerDescription,
+                                                    customer.offerid,
+                                                    "Employee"
                                                 );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
@@ -360,6 +454,8 @@ const Allupcomingoffer = () => {
                                                     customer.manager,
                                                     customer.offerTitle,
                                                     customer.offerDescription,
+                                                    customer.offerid,
+                                                    "Employee"
                                                 );
                                             }}
                                             className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"

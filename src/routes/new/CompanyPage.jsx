@@ -8,7 +8,7 @@ import useOfferSync from "../../hooks/useOfferSync";
 import { BASE_URL } from "../../API/Api";
 
 const CompanyPage = () => {
-    const { companydata, fetchallcompany } = useAuth();
+    const { companydata, fetchallcompany, managerdata } = useAuth();
     const [showPdfUrl, setShowPdfUrl] = useState(null);
     useOfferSync(fetchallcompany);
     const softdeletecompany = async (id) => {
@@ -61,7 +61,7 @@ const CompanyPage = () => {
         try {
             const response = await API.get('/allcompanyrequest');
             setrequest(response.data.requests);
-            //console.log(response.data.requests);
+            console.log(response.data.requests);
         }
         catch (err) {
             const errorMessage = "get all request data failed";
@@ -69,11 +69,15 @@ const CompanyPage = () => {
             console.error(err);
         }
     };
+
+    console.log(request);
+
     useEffect(() => {
         getallrequest();
     }, [])
 
-    const handleAction = async (id, approved) => {
+
+    const handlePointAction = async (id, approved, companyEmail, companyName, managerName, companyId, points, managerEmail) => {
         try {
             const response = await API.post(`/reviewpoints/${id}`, { approved });
             toast.success(response.data.message);
@@ -81,6 +85,8 @@ const CompanyPage = () => {
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
+            const action = approved ? "approvePoint" : "declinePoint"
+            handleSendMail(action, companyEmail, companyName, managerName, companyId, points, managerEmail);
         }
         catch (err) {
             toast.error(err);
@@ -89,47 +95,221 @@ const CompanyPage = () => {
     };
 
 
-    const handleSendMail = async (action, managerEmail, companyEmail, companyName, managerName) => {
+    const handleSendMail = async (action, companyEmail, companyName, managerName, companyId, points, managerEmail) => {
         try {
             let companySubject = "";
             let companyHtml = "";
             let managerSubject = "";
             let managerHtml = "";
+            let companyPointSubject = "";
+            let companyPointHtml = "";
+
+
+            if (action === "approvePoint") {
+                companyPointSubject = "Your Points Have Been Approved.";
+                companyPointHtml = `
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr><td align="center">
+    <table role="presentation" style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+      <tr><td style="background:#2f67bd;border-top-left-radius:6px;border-top-right-radius:6px;padding:16px 24px;text-align:center;">
+        <h2 style="margin:0;font-size:20px;color:#fff;">Company Points Approved</h2>
+      </td></tr>
+      <tr><td style="padding:24px;font-size:14px;color:#333;">
+        <p style="margin:0 0 12px;">Your points have been <strong>approved</strong>.<br/>
+           <strong>Company ID:</strong> ${companyId}</p><br>
+           <strong>Point :</strong> ${points}<br>
+        <p style="margin:0;">Thank you.</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>`;
+
+                managerSubject = "Your Company Points Have Been Approved.";
+                managerHtml = `
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr><td align="center">
+    <table role="presentation" style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+      <tr><td style="background:#2f67bd;border-top-left-radius:6px;border-top-right-radius:6px;padding:16px 24px;text-align:center;">
+        <h2 style="margin:0;font-size:20px;color:#fff;">Company Points Approved</h2>
+      </td></tr>
+      <tr><td style="padding:24px;font-size:14px;color:#333;">
+        <h2 style="margin:0 0 16px;font-size:18px;">Hello ${managerName}</h2>
+        <p style="margin:0 0 12px;">Your Company points have been <strong>approved</strong>.<br/>
+           <strong>Company ID:</strong> ${companyId}</p><br>
+           <strong>Point :</strong> ${points}<br>
+        <p style="margin:0;">Thank you.</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>`;
+            }
+
+            /* ---------- POINTS: DECLINE ---------- */
+            if (action === "declinePoint") {
+                managerSubject = "Your Company Points Request Has Been Declined.";
+                managerHtml = `
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr><td align="center">
+    <table role="presentation" style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+      <tr><td style="background:#e74c3c;border-top-left-radius:6px;border-top-right-radius:6px;padding:16px 24px;text-align:center;">
+        <h2 style="margin:0;font-size:20px;color:#fff;">Company Points Declined</h2>
+      </td></tr>
+      <tr><td style="padding:24px;font-size:14px;color:#333;">
+        <h2 style="margin:0 0 16px;font-size:18px;">Hello ${managerName}</h2>
+        <p style="margin:0 0 12px;">Unfortunately, your recent <strong>points request</strong> has been declined.<br/>
+           <strong>Company ID:</strong> ${companyId}<br>
+           <strong>Point :</strong> ${points}<br>
+        <p style="margin:0;">If you have any questions, please contact your manager.</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>`;
+            }
+
+
+
 
             if (action === "approve") {
-                companySubject = "🎉 Your Registration Has Been Approved!";
+                companySubject = "Your Registration Has Been Approved!";
+
                 companyHtml = `
-                                    <h2>Hello ${companyName},</h2>
-                                    <p>We are pleased to inform you that your registration has been <strong>approved</strong> by our team.</p>
-                                    <p>Welcome aboard!</p>
-                                    <p>Regards,<br/>Team</p>
+<!-- wrapper -->
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <tr>
+          <td style="background:#2f67bd;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+              Your Registration Has Been Approved!
+            </h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${companyName},</h2>
+
+            <p style="margin:0 0 12px 0;">
+              We are pleased to inform you that your registration has been
+              <strong>approved</strong> by our team.
+            </p>
+
+            <p style="margin:0 0 20px 0;">Welcome aboard!</p>
+
+            <p style="margin:0;">Regards,<br/>Team</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
                                 `;
 
-                managerSubject = "✅ You Approved a company";
+                managerSubject = "You Company has been Approved.";
                 managerHtml = `
-                                    <h2>Hello ${managerName},</h2>
-                                    <p>Your company : <strong>${companyName} have approved.</strong>.</p>
-                                    <p>Thank you for your action.</p>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <tr>
+          <td style="background:#2f67bd;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+              Company Approved
+            </h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
+
+            <p style="margin:0 0 12px 0;">
+              Your Company : <strong>${companyName} has been approved.</strong>.
+            </p>
+
+            <p style="margin:0;">Thank you for your action.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
                                 `;
             }
 
             if (action === "decline") {
-                managerSubject = "❌ Your company has been Declined";
+                managerSubject = "Your Company Has Been Declined.";
                 managerHtml = `
-                                    <h2>Hello ${managerName},</h2>
-                                    <p>company Name: <strong>${companyName}</strong>.</p>
-                                    <p>Please ensure the reason is communicated if needed.</p>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <tr>
+          <td style="background:#e74c3c;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+              Company Declined
+            </h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
+
+            <p style="margin:0 0 12px 0;">
+              Your Company <strong>${companyName}</strong> has been declined.
+            </p>
+            <p style="margin:0;">Thank you for your action.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
                                 `;
             }
 
             if (action === "delete") {
-                managerSubject = "🗑️ Your customer has been Deleted";
+                managerSubject = "Your Company Has Been Deleted.";
                 managerHtml = `
-                                    <h2>Hello ${managerName},</h2>
-                                    <p>company Name: <strong>${companyName}</strong>.</p>
-                                    <p>This action is now logged.</p>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <tr>
+          <td style="background:#e74c3c;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+              Company Deleted
+            </h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
+            <p style="margin:0 0 12px 0;">
+              Your Company <strong>${companyName}</strong> has been deleted.
+            </p>
+            <p style="margin:0;">Thank you for your action.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
                                 `;
             }
+
+
 
             // Send to company only if approved
             if (action === "approve") {
@@ -137,6 +317,15 @@ const CompanyPage = () => {
                     to: [companyEmail],
                     subject: companySubject,
                     html: companyHtml
+                });
+            }
+
+            // Send to company and lowerManager only if approved
+            if (action === "approvePoint") {
+                await API.post("/send-mail", {
+                    to: [companyEmail],
+                    subject: companyPointSubject,
+                    html: companyPointHtml
                 });
             }
 
@@ -246,10 +435,11 @@ const CompanyPage = () => {
                                             </button>
                                             <button
                                                 onClick={() => {
-                                                    softdeletecompany(company._id); handleSendMail("delete", company.name,
+                                                    softdeletecompany(company._id); handleSendMail("delete", company.managerEmail,
                                                         company.email,
-                                                        company.managerEmail,
-                                                        company.manager,);
+                                                        company.name,
+                                                        company.manager
+                                                    );
                                                 }}
                                                 className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                                             >
@@ -262,6 +452,8 @@ const CompanyPage = () => {
                         </table>
                     </div>
                 </div>
+
+
                 {/* company points */}
                 <h1 className="mb-4 mt-4 text-2xl font-bold text-gray-800 dark:text-white">Approve Company points</h1>
                 <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900">
@@ -300,14 +492,14 @@ const CompanyPage = () => {
                                         <td className="px-4 py-3 dark:text-white">{data.manager}</td>
                                         <td className="flex gap-2 px-4 py-3">
                                             <button
-                                                onClick={() => { handleAction(data._id, true); handleSendMail("give"); }}
+                                                onClick={() => { handlePointAction(data._id, true, data.company?.email, data.company?.name, data.manager, data.companyId, data.value, data.managerEmail); }}
                                                 className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                                             >
                                                 <PencilLine size={16} /> Approve
                                             </button>
 
                                             <button
-                                                onClick={() => { handleAction(data._id, false); handleSendMail("redeem"); }}
+                                                onClick={() => { handlePointAction(data._id, false, data.company?.email, data.company?.name, data.manager, data.companyId, data.value, data.managerEmail); }}
                                                 className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                                             >
                                                 <Trash size={16} /> Decline

@@ -13,14 +13,14 @@ const LowerManagerAllupcomingoffer = () => {
     const [expandedOffers, setExpandedOffers] = useState({});
 
     // delete upcomingoffer
-    const deleteoffer = async (id, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const deleteoffer = async (id, offer, superManagerEmail) => {
         try {
             const response = await API.put(`/deleteupcomingoffer/${id}`);
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
             toast.success("Delete request of customer upcoming offer send to super manager successfully");
-            await handleSendMail(offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
+            await handleSendMail(offer, superManagerEmail);
         } catch (err) {
             const errorMessage = err.response?.data?.message || "delete failed";
             toast.error(errorMessage);
@@ -28,14 +28,14 @@ const LowerManagerAllupcomingoffer = () => {
         }
     };
     // delte employee upcoming offer
-    const deleteemployeeoffer = async (id, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const deleteemployeeoffer = async (id, offer, superManagerEmail) => {
         try {
             const response = await API.put(`/deleteemployeeupcomingoffer/${id}`);
             const bc = new BroadcastChannel("offer_status_channel");
             bc.postMessage({ type: "OFFER_STATUS_UPDATED" });
             bc.close();
             toast.success("Delete request of employee upcoming offer send to super manager successfully");
-            await handleSendMail(offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
+            await handleSendMail(offer, superManagerEmail);
         } catch (err) {
             const errorMessage = err.response?.data?.message || "reject failed";
             toast.error(errorMessage);
@@ -51,12 +51,12 @@ const LowerManagerAllupcomingoffer = () => {
         }));
     };
 
-    const handleSendMail = async (offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const handleSendMail = async (offer, superManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Deleting upcoming offer came for Approval",
-                html: generateHtmlTemplate(offer, lowerManagerFirstName, lowerManagerLastName)
+                html: generateHtmlTemplate(offer)
             });
 
             toast.success(response.data.message);
@@ -67,7 +67,7 @@ const LowerManagerAllupcomingoffer = () => {
     };
 
 
-    const generateHtmlTemplate = (offer, lowerManagerFirstName, lowerManagerLastName) => {
+    const generateHtmlTemplate = (offer) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -82,8 +82,8 @@ const LowerManagerAllupcomingoffer = () => {
         border-radius: 10px;
         background-color: #f9f9f9;
       }
-      .header {
-        background-color:rgb(239, 68, 68);
+      header {
+        background-color:rgb(175, 76, 76);
         color: white;
         padding: 15px;
         text-align: center;
@@ -113,7 +113,8 @@ const LowerManagerAllupcomingoffer = () => {
         <p>Dear Super Manager,</p>
         <p>
           Upcoming Offer has been deleted by 
-          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+          <strong>${offer.manager}</strong><br>
+          <strong>${offer.managerEmail}</strong> and requires your action.
         </p>
         <p><strong>Offer Id:</strong>${offer.offerid}</p>
         <p><strong>Offer Name:</strong> ${offer.offerTitle}</p>
@@ -187,7 +188,7 @@ const LowerManagerAllupcomingoffer = () => {
                                             </button></Link>
                                         <button onClick={() => {
                                             deleteoffer(customer._id,
-                                                customer, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname
+                                                customer, managerdata[0]?.email
                                             )
                                         }}
                                             className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">
@@ -254,7 +255,7 @@ const LowerManagerAllupcomingoffer = () => {
                                             </button></Link>
                                         <button onClick={() => {
                                             deleteemployeeoffer(customer._id,
-                                                customer, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname
+                                                customer, managerdata[0]?.email
                                             )
                                         }} className="flex items-center gap-1 px-3 py-1 my-3 bg-red-500 text-white rounded">
                                             <Trash size={16} /> Delete

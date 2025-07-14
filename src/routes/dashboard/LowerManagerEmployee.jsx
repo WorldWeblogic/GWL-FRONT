@@ -54,7 +54,7 @@ const LowerManagerEmployee = () => {
         border-radius: 10px;
         background-color: #f9f9f9;
       }
-      .header {
+     header {
         background-color:rgb(175, 76, 76);
         color: white;
         padding: 15px;

@@ -24,7 +24,6 @@ export const AuthProvier = ({ children }) => {
     const fetchalluser = async () => {
         try {
             const response = await API.get("/alluser");
-            //console.log(response.data.customer);
             setCustomersdata(response.data.customer);
         } catch (err) {
             console.error(err);
@@ -77,7 +76,6 @@ export const AuthProvier = ({ children }) => {
         try {
             const response = await API.get("/allemployee");
             setemployeedata(response.data.employees);
-            //console.log(response.data.employees);
         } catch (err) {
             console.error(err);
         }
@@ -100,8 +98,6 @@ export const AuthProvier = ({ children }) => {
             console.log("Error fetching user data:", err.response?.status || err.message);
         }
     };
-
-    // console.log(singleemployee);
 
     useEffect(() => {
         const employeeid = sessionStorage.getItem("employeeid");
@@ -150,7 +146,6 @@ export const AuthProvier = ({ children }) => {
     const fetchallLowermanager = async () => {
         try {
             const response = await API.get("/allLowermanager");
-            //console.log(response.data.manager);
             setlowermanagerdata(response.data.manager);
         } catch (err) {
             console.error(err);

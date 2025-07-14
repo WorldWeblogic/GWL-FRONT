@@ -7,6 +7,7 @@ import API from "../../API/Api";
 
 const AddEmployeeUpcomingoffer = () => {
     const { fetchemployeeallupcomingoffer, lowermanager, managerdata } = useAuth()
+    const lowermanagersession = sessionStorage.getItem("lowermanagerid");
     const [data, setdata] = useState({
         offerTitle: "",
         offerDescription: "",
@@ -35,7 +36,7 @@ const AddEmployeeUpcomingoffer = () => {
         });
     };
 
-    const handlesubmit = async (e, offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const handlesubmit = async (e, offer, superManagerEmail) => {
         e.preventDefault();
         try {
             await API.post("/upcomingcreate-employee-offer",
@@ -53,7 +54,6 @@ const AddEmployeeUpcomingoffer = () => {
                     withCredentials: true
                 }
             );
-            //console.log(response);
             setdata({
                 offerTitle: "",
                 offerDescription: "",
@@ -63,7 +63,7 @@ const AddEmployeeUpcomingoffer = () => {
             });
             await fetchemployeeallupcomingoffer();
             toast.success("Employee Upcoming offer created successfully!");
-            handleSendMail(offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName);
+            lowermanagersession ? await handleSendMail(offer, superManagerEmail) : null
         } catch (err) {
             const message = err.response?.data?.extradetails || err.response?.data?.message || "offer created failed";
             toast.error(message);
@@ -84,12 +84,12 @@ const AddEmployeeUpcomingoffer = () => {
         })
     }
 
-    const handleSendMail = async (offer, superManagerEmail, lowerManagerFirstName, lowerManagerLastName) => {
+    const handleSendMail = async (offer, superManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
                 subject: "Action Required : Please Review Employee Upcoming Offer",
-                html: generateHtmlTemplate(offer, lowerManagerFirstName, lowerManagerLastName),
+                html: generateHtmlTemplate(offer),
             });
 
             toast.success(response.data.message);
@@ -100,7 +100,7 @@ const AddEmployeeUpcomingoffer = () => {
     };
 
 
-    const generateHtmlTemplate = (offer, lowerManagerFirstName, lowerManagerLastName) => {
+    const generateHtmlTemplate = (offer) => {
         return `
    <!DOCTYPE html>
 <html>
@@ -116,7 +116,7 @@ const AddEmployeeUpcomingoffer = () => {
         background-color: #f9f9f9;
       }
       .header {
-        background-color:rgb(5, 114, 19);
+        background-color:rgb(55, 105, 180);
         color: white;
         padding: 15px;
         text-align: center;
@@ -146,7 +146,7 @@ const AddEmployeeUpcomingoffer = () => {
         <p>Dear Super Manager,</p>
         <p>
          Upcoming Employee Offer has been Added by 
-          <strong>${lowerManagerFirstName} ${lowerManagerLastName}</strong> and requires your action.
+          <strong>${lowermanager.firstname} ${lowermanager.lastname}</strong> and requires your action.
         </p>
         <p><strong>Offer Id:</strong>${offer.offerid}</p>
         <p><strong>Offer Name:</strong> ${offer.offerTitle}</p>
@@ -244,8 +244,7 @@ const AddEmployeeUpcomingoffer = () => {
                         <button
                             onClick={(e) => {
                                 handlesubmit(e,
-                                    data, managerdata[0]?.email, lowermanager.firstname, lowermanager.lastname
-                                )
+                                    data, managerdata[0]?.email)
                             }}
                             type="submit"
                             className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"

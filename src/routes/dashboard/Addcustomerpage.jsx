@@ -5,7 +5,8 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const AddcustomerPage = () => {
-    const { fetchalluser, managerdata, customersdata, lowermanager } = useAuth();
+    const { fetchalluser, managerdata, lowermanager } = useAuth();
+    const lowermanagersession = sessionStorage.getItem("lowermanagerid");
     const [company, setCompany] = useState([]);
     const [data, setdata] = useState({
         firstname: "",
@@ -54,7 +55,7 @@ const AddcustomerPage = () => {
             });
             await fetchalluser();
             toast.success("customer created successfully !");
-            await handleSendMail(e, superManagerEmail, customer);
+            lowermanagersession ? await handleSendMail(superManagerEmail, customer) : null
         } catch (err) {
             const message = err.response?.data?.message || "Signup failed";
             toast.error(message);
@@ -86,8 +87,7 @@ const AddcustomerPage = () => {
         getCompanyName();
     }, []);
 
-    const handleSendMail = async (e, superManagerEmail, customer) => {
-        e.preventDefault();
+    const handleSendMail = async (superManagerEmail, customer) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
@@ -118,7 +118,7 @@ const AddcustomerPage = () => {
         border-radius: 10px;
         background-color: #f9f9f9;
       }
-      .header {
+    .header {
         background-color:rgb(55, 105, 180);
         color: white;
         padding: 15px;
