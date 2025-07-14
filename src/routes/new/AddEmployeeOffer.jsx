@@ -5,8 +5,8 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const AddEmployeeOffers = () => {
-    const { fetchallemployeeoffer, lowermanager, managerdata, employeeofferdata } = useAuth();
-
+    const { fetchallemployeeoffer, lowermanager, managerdata } = useAuth();
+    const lowermanagersession = sessionStorage.getItem("lowermanagerid");
     const [data, setdata] = useState({
         offerTitle: "",
         offerDescription: "",
@@ -60,7 +60,7 @@ const AddEmployeeOffers = () => {
             toast.success(
                 "Employee offer created and notification sent to Super Manager."
             );
-            await handleSendMail(superManagerEmail, lowerManagerFirstName, lowerManagerLastName, offer);
+            lowermanagersession ? await handleSendMail(superManagerEmail, lowerManagerFirstName, lowerManagerLastName, offer) : null
             getEmpOfferId(); // set new ID after success
             setdata({
                 offerTitle: "",

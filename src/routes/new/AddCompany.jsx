@@ -5,7 +5,8 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const AddCompany = () => {
-    const { fetchallcompany, lowermanager, managerdata, companydata } = useAuth();
+    const { fetchallcompany, lowermanager, managerdata } = useAuth();
+    const lowermanagersession = sessionStorage.getItem("lowermanagerid");
     const phone = useRef();
     const [emiratesId, setEmiratesId] = useState("");
     const [data, setData] = useState({
@@ -86,14 +87,13 @@ const AddCompany = () => {
             setPdf1(null);
             getComId();
             getEmiratesID();
-            await handleSendMail(e, company, superManagerEmail);
+            lowermanagersession ? await handleSendMail(company, superManagerEmail) : null
         } catch (err) {
             toast.error(err.response?.data?.message || "Error occurred");
         }
     };
 
-    const handleSendMail = async (e, company, superManagerEmail) => {
-        e.preventDefault();
+    const handleSendMail = async (company, superManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],

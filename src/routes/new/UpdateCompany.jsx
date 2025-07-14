@@ -6,7 +6,7 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const UpdateCompany = () => {
-    const { fetchallcompany, lowermanager } = useAuth();
+    const { fetchallcompany, lowermanager, managerdata } = useAuth();
     const [companyId, setcompanyId] = useState('');
     const [type, setType] = useState('add');
     const [value, setValue] = useState('');
@@ -100,16 +100,17 @@ const UpdateCompany = () => {
     }, [])
 
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handlePointSubmit = async (e, points, superManagerEmail, message, compamyId, superManagerName) => {
+        e.preventDefault()
         try {
             const response = await API.post('/companypoints',
                 {
-                    companyId,
+                    companyId: data.companyId,
                     type,
                     value: parseInt(value),
                     notification,
-                    manager: `${lowermanager.firstname} ${lowermanager.lastname}`
+                    manager: `${lowermanager.firstname} ${lowermanager.lastname}`,
+                    managerEmail: lowermanager.email
                 },
                 {
                     headers: {
@@ -123,6 +124,7 @@ const UpdateCompany = () => {
             setValue("");
             setnotification("");
             toast.success('Request sent for admin approval');
+            handleSendMail(points, message, superManagerEmail, compamyId, superManagerName);
         }
         catch (err) {
             toast.error(err.response.data.message);
@@ -130,21 +132,68 @@ const UpdateCompany = () => {
         }
     };
 
-    const handleSendMail = async (e) => {
-        e.preventDefault();
+    const handleSendMail = async (points, message, superManagerEmail, compamyId, superManagerName) => {
         try {
-            const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Offer notification came for Approval",
-                text: "This is a test email sent from MERN app.",
-            });
+            /* ----------  POINTS‑APPROVAL EMAIL  ---------- */
+            const approvalSubject = "Company Points Request";
+            const approvalHtml = `
+<!-- wrapper -->
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <!-- card -->
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <!-- blue header bar -->
+        <tr>
+          <td style="background:#2f67bd;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+              Points Approval Needed
+            </h2>
+          </td>
+        </tr>
 
-            toast.success(response.data.message);
+        <!-- body -->
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">
+              Hello ${superManagerName},
+            </h2>
+
+            <p style="margin:0 0 12px 0;">
+              <strong>${lowermanager?.firstname} ${lowermanager?.lastname}</strong> has submitted company points request for approval.
+            </p>
+
+            <p style="margin:0 0 12px 0;">
+              <strong>Company Id ID:</strong> ${compamyId}<br>
+              <strong>Points Requested:</strong> ${points}<br>
+              <strong>Message:</strong> ${message}
+            </p>
+
+            <p style="margin:0;">Please review and approve or decline this request at your earliest convenience.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+`;
+            await API.post("/send-mail", {
+                to: [superManagerEmail],
+                subject: approvalSubject,
+                html: approvalHtml,
+            });
+            toast.success("Mail Sent");
         } catch (error) {
             console.error("Error sending mail:", error);
             toast.error(error);
         }
     };
+
+
+
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
             {sessionStorage.getItem("adminid") || sessionStorage.getItem("managerid") ? (
@@ -342,6 +391,8 @@ const UpdateCompany = () => {
                             </div>
                         </form>
                     </div>
+
+
                     {/* give points */}
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">New Points</h1>
                     <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6">
@@ -351,8 +402,8 @@ const UpdateCompany = () => {
                                     <label className="mb-1 dark:text-white">Company_Id</label>
                                     <input type="text"
                                         placeholder="Company ID"
-                                        value={companyId}
-                                        onChange={(e) => setcompanyId(e.target.value)}
+                                        value={data.companyId}
+                                        readOnly
                                         className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                                     />
                                 </div>
@@ -388,7 +439,11 @@ const UpdateCompany = () => {
 
                             <div className="mt-6">
                                 <button
-                                    onClick={(e) => { handleSubmit(e); handleSendMail(e); }}
+                                    onClick={(e) => {
+                                        handlePointSubmit
+                                            (e, value, managerdata[0]?.email, notification, data.companyId,
+                                                `${managerdata[0]?.firstname} ${managerdata[0]?.lastname}`);
+                                    }}
                                     className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                                 >
                                     Submit

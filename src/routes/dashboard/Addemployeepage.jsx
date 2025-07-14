@@ -5,7 +5,8 @@ import { useAuth } from "../../contexts/auth";
 import API from "../../API/Api";
 
 const AddemployeePage = () => {
-    const { lowermanager, fetchallemployee, managerdata, employeedata } = useAuth();
+    const { lowermanager, fetchallemployee, managerdata } = useAuth();
+    const lowermanagersession = sessionStorage.getItem("lowermanagerid");
     const phone = useRef();
     function handlenumber(e) {
         // Remove all characters except digits and dashes
@@ -59,7 +60,7 @@ const AddemployeePage = () => {
             });
             await fetchallemployee();
             toast.success("employee added successfully !");
-            await handleSendMail(e, employee, superManagerEmail);
+            lowermanagersession ? await handleSendMail(employee, superManagerEmail) : null
         } catch (err) {
             const message = err.response.data.message || "adding employee failed";
             toast.error(message);
@@ -85,8 +86,7 @@ const AddemployeePage = () => {
         getEmpId();
     }, [])
 
-    const handleSendMail = async (e, employee, superManagerEmail) => {
-        e.preventDefault();
+    const handleSendMail = async (employee, superManagerEmail) => {
         try {
             const response = await API.post("/send-mail", {
                 to: [superManagerEmail],
@@ -152,7 +152,8 @@ const AddemployeePage = () => {
         </p>
         <p><strong>Employee ID : </strong> ${employee.employeeid} <br>
         <strong>Employee Name : </strong> ${employee.firstname} ${employee.lastname} <br>
-        <strong>Employee Email : </strong>${employee.email}</p>
+        <strong>Employee Email : </strong>${employee.email}<br>
+        </p>
 
         <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
       </div>

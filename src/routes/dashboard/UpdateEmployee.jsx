@@ -25,7 +25,7 @@ const UpdateEmployee = () => {
         marketingMaterials,
         estimatedPoints,
     } = state;
-    const { fetchallemployee, lowermanager } = useAuth();
+    const { fetchallemployee, lowermanager, managerdata } = useAuth();
     const phone = useRef();
     function handlenumber(e) {
         // Remove all characters except digits and dashes
@@ -87,7 +87,8 @@ const UpdateEmployee = () => {
     const [notification, setnotification] = useState("");
     const [value, setValue] = useState('');
 
-    const handleSubmit = async (e) => {
+
+    const handlePointSubmit = async (e, points, message, superManagerEmail, employeeId, superManagerName) => {
         e.preventDefault();
         try {
             await API.post('/request',
@@ -96,7 +97,8 @@ const UpdateEmployee = () => {
                     type,
                     value: parseInt(value),
                     notification,
-                    manager: `${lowermanager.firstname} ${lowermanager.lastname}`
+                    manager: `${lowermanager.firstname} ${lowermanager.lastname}`,
+                    superManagerEmail: lowermanager.email
                 },
                 {
                     headers: {
@@ -105,8 +107,8 @@ const UpdateEmployee = () => {
                     withCredentials: true,
                 }
             );
-            toast.success('Request sent for admin approval');
-            await handleSendMail(e);
+            toast.success('Request sent for approval');
+            await handleSendMail(e, points, message, superManagerEmail, employeeId, superManagerName);
         }
         catch (err) {
             toast.error(err.response.data.message);
@@ -117,32 +119,82 @@ const UpdateEmployee = () => {
     useEffect(() => {
         API.get(`/employee/${LManagerCustId}`)
             .then(res => {
+                const emp = res.data.employeedata;
                 setdata({
-                    email: res.data.employeedata.email,
-                    firstname: res.data.employeedata.firstname,
-                    lastname: res.data.employeedata.lastname,
-                    employeeid: res.data.employeedata.employeeid,
-                    phone: res.data.employeedata.phone,
-                })
+                    email: emp.email,
+                    firstname: emp.firstname,
+                    lastname: emp.lastname,
+                    employeeid: emp.employeeid,
+                    phone: emp.phone,
+                });
+                setemployeeId(emp.employeeid);
             }).catch(err => {
                 console.log(err);
             })
     }, [])
 
-    const handleSendMail = async (e) => {
+
+    const handleSendMail = async (e, points, message, superManagerEmail, employeeId, superManagerName) => {
         e.preventDefault();
         try {
-            const response = await API.post("/send-mail", {
-                to: "skr36880@gmail.com",
-                subject: "Offer notification came for Approval",
-                text: "This is a test email sent from MERN app.",
+            /* ----------  POINTS‑APPROVAL EMAIL  ---------- */
+            const approvalSubject = "Offer Points Request";
+            const approvalHtml = `
+<!-- wrapper -->
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f5f7fa;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <!-- card -->
+      <table cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width:600px;width:100%;border:1px solid #d9d9d9;border-radius:6px;
+                    font-family:Arial,Helvetica,sans-serif;background:#ffffff;">
+        <!-- blue header bar -->
+        <tr>
+          <td style="background:#2f67bd;border-top-left-radius:6px;border-top-right-radius:6px;
+                     padding:16px 24px;text-align:center;">
+            <h2 style="margin:0;font-size:20px;line-height:24px;color:#ffffff;">
+              Points Approval Needed
+            </h2>
+          </td>
+        </tr>
+
+        <!-- body -->
+        <tr>
+          <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
+            <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">
+              Hello ${superManagerName},
+            </h2>
+
+            <p style="margin:0 0 12px 0;">
+              <strong>${lowermanager?.firstname} ${lowermanager?.lastname}</strong> has submitted an offer points request for approval.
+            </p>
+
+            <p style="margin:0 0 12px 0;">
+              <strong>Employee ID:</strong> ${employeeId}<br>
+              <strong>Points Requested:</strong> ${points}<br>
+              <strong>Message:</strong> ${message}
+            </p>
+
+            <p style="margin:0;">Please review and approve or decline this request at your earliest convenience.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+`;
+            await API.post("/send-mail", {
+                to: [superManagerEmail],
+                subject: approvalSubject,
+                html: approvalHtml,
             });
-            toast.success(response.data.message);
+            toast.success("Mail Sent");
         } catch (error) {
             console.error("Error sending mail:", error);
             toast.error(error);
         }
     };
+
 
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
@@ -353,6 +405,8 @@ const UpdateEmployee = () => {
                             </div>
                         </form>
                     </div>
+
+
                     {/* Employee View - Points Data */}
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Employee Points Data</h1>
                     <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6">
@@ -381,6 +435,8 @@ const UpdateEmployee = () => {
                         </div>
                     </div>
 
+
+
                     {/* Give Points Section */}
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">New Points</h1>
                     <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6">
@@ -391,8 +447,8 @@ const UpdateEmployee = () => {
                                     <input
                                         type="text"
                                         placeholder="Employee ID"
-                                        value={employeeid}
-                                        onChange={(e) => setemployeeId(e.target.value)}
+                                        value={data.employeeid}
+                                        readOnly
                                         className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
                                     />
                                 </div>
@@ -430,7 +486,7 @@ const UpdateEmployee = () => {
 
                             <div className="mt-6">
                                 <button
-                                    onClick={(e) => { handleSubmit(e) }}
+                                    onClick={(e) => { handlePointSubmit(e, value, notification, managerdata[0]?.email, data.employeeid, `${managerdata[0]?.firstname} ${managerdata[0]?.lastname}`) }}
                                     className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                                 >
                                     Submit
