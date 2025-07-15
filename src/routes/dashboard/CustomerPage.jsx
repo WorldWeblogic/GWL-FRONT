@@ -18,7 +18,7 @@ const CustomerPage = () => {
         if (id) {
             fetchcustomerData(id);
         }
-    }, [fetchcustomerData]);
+    }, []);
     // get all offer function
     const [offerdata, setofferdata] = useState([]);
     const fetchalloffer = async () => {

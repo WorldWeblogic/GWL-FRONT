@@ -51,7 +51,7 @@ const ManagerCustomer = () => {
     bc.close();
   };
 
-  const handleSendMail = async (action, customerEmail, managerEmail, customerName, managerName) => {
+  const handleSendMail = async (action, customerEmail, managerEmail, customerName, managerName, customerId) => {
     try {
       let customerSubject = "";
       let customerHtml = "";
@@ -114,7 +114,8 @@ const ManagerCustomer = () => {
           <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
             <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
             <p style="margin:0 0 12px 0;">
-              Your Customer : <strong>${customerName} have approved.</strong>.
+              Your Customer : <strong>${customerName} have approved.</strong>.<br>
+               Customer Id : <strong>${customerId}</strong>.
             </p>
             <p style="margin:0;">Thank you for your action.</p>
           </td>
@@ -149,7 +150,8 @@ const ManagerCustomer = () => {
             <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
 
             <p style="margin:0 0 12px 0;">
-              Your customer <strong>${customerName}</strong> has been declined.
+              Your customer <strong>${customerName}</strong> has been declined.<br>
+               Customer Id : <strong>${customerId}</strong>.
             </p>
 
             <p style="margin:0;">Thank you for your action.</p>
@@ -189,7 +191,8 @@ const ManagerCustomer = () => {
             <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
 
             <p style="margin:0 0 12px 0;">
-              Your customer <strong>${customerName}</strong> has been deleted.
+              Your customer <strong>${customerName}</strong> has been deleted.<br>
+               Customer Id : <strong>${customerId}</strong>
             </p>
 
             <p style="margin:0;">Thank you for your action.</p>
@@ -265,13 +268,15 @@ const ManagerCustomer = () => {
                             customer.email,
                             customer.managerEmail,
                             `${customer.firstname} ${customer.lastname} `,
-                            customer.manager
+                            customer.manager,
+                            customer.customerid
                           );
                         }}
                         className="flex items-center gap-1 px-3 py-1 bg-green-500 text-white rounded my-2"
                       >
                         <Trash size={16} /> Approve
                       </button>
+
                       <button
                         onClick={() => {
                           declineCustomer(customer._id);
@@ -280,7 +285,8 @@ const ManagerCustomer = () => {
                             customer.email,
                             customer.managerEmail,
                             `${customer.firstname} ${customer.lastname} `,
-                            customer.manager
+                            customer.manager,
+                            customer.customerid
                           );
                         }}
                         className="flex items-center gap-1 px-4 py-1 bg-orange-500 text-white rounded my-2"
@@ -295,7 +301,8 @@ const ManagerCustomer = () => {
                             customer.email,
                             customer.managerEmail,
                             `${customer.firstname} ${customer.lastname} `,
-                            customer.manager
+                            customer.manager,
+                            customer.id
                           );
                         }}
                         className="flex items-center gap-1 px-4 py-1 bg-red-500 text-white rounded my-2"

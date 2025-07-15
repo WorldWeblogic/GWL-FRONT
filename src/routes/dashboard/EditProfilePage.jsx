@@ -7,12 +7,12 @@ import { useAuth } from "../../contexts/auth";
 const EditProfilePage = () => {
     // function to fetch admion data from the server
     const { user, fetchcustomerData } = useAuth();
-     useEffect(() => {
+    useEffect(() => {
         const id = sessionStorage.getItem("id");
         if (id) {
             fetchcustomerData(id);
         }
-    }, [fetchcustomerData]);
+    }, []);
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-6">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Customer</h1>

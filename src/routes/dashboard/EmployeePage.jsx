@@ -52,6 +52,8 @@ const EmployeePage = () => {
     const getallrequest = async () => {
         try {
             const response = await API.get("/allrequest");
+            // console.log(response);
+
             setrequest(response.data.requests);
         } catch (err) {
             console.error("get all request data failed", err);
@@ -158,27 +160,24 @@ const EmployeePage = () => {
                             <p className="card-title">Notification</p>
                         </div>
                         <div className="card-body h-full overflow-y-auto p-0">
-                            {request
-                                .slice()
-                                .reverse()
-                                .map((sale) => (
-                                    <div
-                                        key={sale._id}
-                                        className="flex flex-col gap-y-2 border-b border-slate-200 p-3 dark:border-slate-700"
-                                    >
-                                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                                            {expandedOffers[`latest-${sale._id}`] ? sale.notification : truncateText(sale.notification, 50)}
-                                            {sale.notification?.length > 50 && (
-                                                <button
-                                                    onClick={() => toggleDescription(`latest-${sale._id}`)}
-                                                    className="ml-1 text-xs font-medium text-red-500 hover:underline"
-                                                >
-                                                    {expandedOffers[`latest-${sale._id}`] ? " Show Less" : " Show More"}
-                                                </button>
-                                            )}
-                                        </p>
-                                    </div>
-                                ))}
+                            {singleemployee?.message?.slice().reverse().map((sale, index) => (
+                                <div
+                                    key={index}
+                                    className="flex flex-col gap-y-2 border-b border-slate-200 p-3 dark:border-slate-700"
+                                >
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        {expandedOffers[`latest-${sale._id}`] ? sale : truncateText(sale, 50)}
+                                        {sale?.length > 50 && (
+                                            <button
+                                                onClick={() => toggleDescription(`latest-${sale._id}`)}
+                                                className="ml-1 text-xs font-medium text-red-500 hover:underline"
+                                            >
+                                                {expandedOffers[`latest-${sale._id}`] ? " Show Less" : " Show More"}
+                                            </button>
+                                        )}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -215,7 +214,7 @@ const EmployeePage = () => {
                 </div>
             </div>
 
-             <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900">
+            <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900">
                 <div className="mb-4 flex items-start justify-between gap-4 lg:flex-row lg:items-center">
                     <p className="font-semibold dark:text-white sm:text-sm lg:text-lg">Showing {offerdata.length} Offers</p>
                 </div>
@@ -236,11 +235,11 @@ const EmployeePage = () => {
                                     <td className="px-4 py-3 dark:text-white">{data.offerTitle}</td>
                                     <td className="px-4 py-3 dark:text-white">{data.offerDescription}</td>
                                     <td className="px-4 py-3 dark:text-white">
-                                    {new Date(data.endDate).toLocaleDateString("en-GB", {
+                                        {new Date(data.endDate).toLocaleDateString("en-GB", {
                                             day: "2-digit",
                                             month: "long",
                                             year: "numeric",
-                                    })}</td>
+                                        })}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -248,7 +247,7 @@ const EmployeePage = () => {
                 </div>
             </div>
 
-            
+
             <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900">
                 <div className="mb-4 flex items-start justify-between gap-4 lg:flex-row lg:items-center">
                     <p className="font-semibold dark:text-white sm:text-sm lg:text-lg">Showing {upcomingofferdata.length} Upcoming Offers</p>
@@ -270,11 +269,11 @@ const EmployeePage = () => {
                                     <td className="px-4 py-3 dark:text-white">{data.offerTitle}</td>
                                     <td className="px-4 py-3 dark:text-white">{data.offerDescription}</td>
                                     <td className="px-4 py-3 dark:text-white">
-                                    {new Date(data.endDate).toLocaleDateString("en-GB", {
+                                        {new Date(data.endDate).toLocaleDateString("en-GB", {
                                             day: "2-digit",
                                             month: "long",
                                             year: "numeric",
-                                    })}
+                                        })}
                                     </td>
                                 </tr>
                             ))}

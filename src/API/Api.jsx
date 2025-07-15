@@ -6,5 +6,3 @@ const API = axios.create({
 })
 export const BASE_URL = "https://gwl-back-1.onrender.com";
 export default API;
-
-
