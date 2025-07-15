@@ -154,7 +154,7 @@ const AddcustomerPage = () => {
         </p>
         <p><strong>Customer ID:</strong> ${customer.customerid} <br>
         <strong>Customer Name:</strong> ${customer.firstname} ${customer.lastname} <br>
-        <strong>Customer Email:</strong>${customer.email}</p>
+        <strong>Customer Email: </strong>${customer.email}</p>
 
         <p style="margin-top: 20px;">Thanks,<br/>Your Team</p>
       </div>

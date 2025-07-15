@@ -90,6 +90,7 @@ import LManagerRoute from "./routes/LManagerRoute";
 import Updateadmin from "./routes/dashboard/Updateadmin";
 import Leaderboard from "./routes/dashboard/Leaderboard";
 import FAQ from "./routes/dashboard/FAQ";
+import MonthEndGuard from "./pages/MonthEndGaurd";
 
 function App() {
     const router = createBrowserRouter([
@@ -183,12 +184,25 @@ function App() {
                             <ManageEmployee />
                         </EmployeeRoute>)
                 },
+                // {
+                //     path: "/Employeelayout/monthlysaleform", element: (
+                //         <EmployeeRoute>
+                //             <Monthlysaleform />
+                //         </EmployeeRoute>)
+                // },
                 {
-                    path: "/Employeelayout/monthlysaleform", element: (
+                    path: "/Employeelayout/monthlysaleform",
+                    element: (
                         <EmployeeRoute>
-                            <Monthlysaleform />
-                        </EmployeeRoute>)
+                            <MonthEndGuard>
+                                <Monthlysaleform />
+                            </MonthEndGuard>
+                        </EmployeeRoute>
+                    ),
                 },
+
+
+
                 {
                     path: "/Employeelayout/faq",
                     element: (

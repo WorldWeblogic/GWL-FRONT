@@ -107,12 +107,15 @@ const Monthlysaleform = () => {
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Monthly Sale Form</h1>
+            <div className="flex gap-x-4">
+                <p className="dark:text-white">Upload your monthly sales data in Excel format.</p>
+                <input
+                    type="file"
+                    accept=".xlsx, .xls"
+                    onChange={handleFileUpload}
+                />
+            </div>
 
-            <input
-                type="file"
-                accept=".xlsx, .xls"
-                onChange={handleFileUpload}
-            />
             <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6">
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -329,3 +332,6 @@ const Monthlysaleform = () => {
 };
 
 export default Monthlysaleform;
+
+
+// Protect route Employee monthly sale form to fill every dates, validates like fill only last day of the month.

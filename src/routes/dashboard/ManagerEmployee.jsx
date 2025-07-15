@@ -59,8 +59,6 @@ const ManagerEmployee = () => {
   const getallrequest = async () => {
     try {
       const response = await API.get("/allrequest");
-      console.log(response);
-
       setrequest(response.data.requests);
     } catch (err) {
       const errorMessage = "get all request data failed";
@@ -162,7 +160,8 @@ const ManagerEmployee = () => {
             <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
 
             <p style="margin:0 0 12px 0;">
-              Your Employee : <strong>${employeeName} has been approved.</strong>.
+              Your Employee : <strong>${employeeName} has been approved.</strong>.<br>
+               Employee Id : <strong>${employeePoints}</strong>.
             </p>
 
             <p style="margin:0;">Thank you for your action.</p>
@@ -197,7 +196,8 @@ const ManagerEmployee = () => {
             <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
 
             <p style="margin:0 0 12px 0;">
-              Your Employee <strong>${employeeName}</strong> has been declined.
+              Your Employee <strong>${employeeName}</strong> has been declined.<br>
+               Employee Id : <strong>${employeePoints}</strong>.
             </p>
             <p style="margin:0;">Thank you for your action.</p>
           </td>
@@ -230,7 +230,8 @@ const ManagerEmployee = () => {
           <td style="padding:24px;font-size:14px;line-height:20px;color:#333333;">
             <h2 style="margin:0 0 16px 0;font-size:18px;line-height:22px;">Hello ${managerName},</h2>
             <p style="margin:0 0 12px 0;">
-              Your employee <strong>${employeeName}</strong> has been deleted.
+              Your employee <strong>${employeeName}</strong> has been deleted.<br>
+               Employee Id : <strong>${employeePoints}</strong>.
             </p>
             <p style="margin:0;">Thank you for your action.</p>
           </td>
@@ -378,7 +379,7 @@ const ManagerEmployee = () => {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <span className="dark:text-white">
-                          {employee.firstname} {employee.lastname}
+                          {employee?.firstname} {employee?.lastname}
                         </span>
                       </div>
                     </td>
@@ -397,7 +398,7 @@ const ManagerEmployee = () => {
                             employee.managerEmail,
                             employee.email,
                             `${employee.firstname} ${employee.lastname}`,
-                            employee.manager);
+                            employee.manager, employee.employeeid);
                         }}
                         className="my-2 flex items-center gap-1 rounded bg-green-500 px-3 py-1 text-white"
                       >
@@ -411,7 +412,7 @@ const ManagerEmployee = () => {
                             employee.managerEmail,
                             employee.email,
                             `${employee.firstname} ${employee.lastname}`,
-                            employee.manager);
+                            employee.manager, employee.employeeid);
                         }}
                         className="my-2 flex items-center gap-1 rounded bg-orange-500 px-4 py-1 text-white"
                       >
@@ -424,7 +425,7 @@ const ManagerEmployee = () => {
                             employee.managerEmail,
                             employee.email,
                             `${employee.firstname} ${employee.lastname}`,
-                            employee.manager);
+                            employee.manager, employee.employeeid);
                         }}
                         className="my-2 flex items-center gap-1 rounded bg-red-500 px-4 py-1 text-white"
                       >
@@ -469,7 +470,7 @@ const ManagerEmployee = () => {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <span className="dark:text-white">
-                          {data.employee.firstname} {data.employee.lastname}
+                          {data.employee?.firstname} {data.employee?.lastname}
                         </span>
                       </div>
                     </td>
