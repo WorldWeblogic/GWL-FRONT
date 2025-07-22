@@ -51,6 +51,3 @@ const Layout = () => {
 };
 
 export default Layout;
-
-
-// h-[calc(100vh-60px)]
