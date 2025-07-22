@@ -14,25 +14,25 @@ function LoginForm() {
     const navigate = useNavigate();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const { storetoken } = useAuth();
-    
-    function firemessage(){
+
+    function firemessage() {
         Swal.fire({
             title: "Contact Manager for change password",
             showClass: {
-              popup: `
+                popup: `
                 animate__animated
                 animate__fadeInUp
                 animate__faster
               `
             },
             hideClass: {
-              popup: `
+                popup: `
                 animate__animated
                 animate__fadeOutDown
                 animate__faster
               `
             }
-          });
+        });
     }
     const [data, setData] = useState({
         email: "",
@@ -55,12 +55,14 @@ function LoginForm() {
         e.preventDefault();
         try {
             const response = await API.post("/login", data);
+            console.log(response.data.payload.userId);
+
             storetoken(response.data.token);
             setData({
                 email: "",
                 password: "",
             });
-            sessionStorage.setItem("id",response.data.payload.userId);
+            sessionStorage.setItem("id", response.data.payload.userId);
             navigate("/Customerlayout");
         } catch (err) {
             const message = err.response?.data?.extradetails || err.response?.data?.message || "Login failed";
@@ -150,7 +152,7 @@ function LoginForm() {
 
 
 
-        
+
     );
 }
 

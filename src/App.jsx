@@ -91,6 +91,10 @@ import Updateadmin from "./routes/dashboard/Updateadmin";
 import Leaderboard from "./routes/dashboard/Leaderboard";
 import FAQ from "./routes/dashboard/FAQ";
 import MonthEndGuard from "./pages/MonthEndGaurd";
+import Error404 from "./pages/Error404";
+import Salesform from "./routes/dashboard/Salesform";
+import Updatesaleform from "./routes/dashboard/Updatesaleform";
+import SingleEmployeeMonthlySale from "./routes/dashboard/SingleEmployeeMonthlySale";
 
 function App() {
     const router = createBrowserRouter([
@@ -184,22 +188,34 @@ function App() {
                             <ManageEmployee />
                         </EmployeeRoute>)
                 },
-                // {
-                //     path: "/Employeelayout/monthlysaleform", element: (
-                //         <EmployeeRoute>
-                //             <Monthlysaleform />
-                //         </EmployeeRoute>)
-                // },
                 {
-                    path: "/Employeelayout/monthlysaleform",
-                    element: (
+                    path: "/Employeelayout/monthlysaleform", element: (
                         <EmployeeRoute>
-                            <MonthEndGuard>
-                                <Monthlysaleform />
-                            </MonthEndGuard>
-                        </EmployeeRoute>
-                    ),
+                            <Monthlysaleform />
+                        </EmployeeRoute>)
                 },
+                {
+                    path: "/Employeelayout/saleform", element: (
+                        <EmployeeRoute>
+                            <Salesform />
+                        </EmployeeRoute>)
+                },
+                {
+                    path: "/Employeelayout/updatesaleform", element: (
+                        <EmployeeRoute>
+                            <Updatesaleform />
+                        </EmployeeRoute>)
+                },
+                // {
+                //     path: "/Employeelayout/monthlysaleform",
+                //     element: (
+                //         <EmployeeRoute>
+                //             <MonthEndGuard>
+                //                 <Monthlysaleform />
+                //             </MonthEndGuard>
+                //         </EmployeeRoute>
+                //     ),
+                // },
 
 
 
@@ -342,6 +358,12 @@ function App() {
                     path: "/LowerManagerlayout/update-employee", element: (
                         <LManagerRoute>
                             <UpdateEmployee />
+                        </LManagerRoute>)
+                },
+                {
+                    path: "/LowerManagerlayout/employee-monthly-sale", element: (
+                        <LManagerRoute>
+                            <SingleEmployeeMonthlySale />
                         </LManagerRoute>)
                 },
                 // upcoming offers
@@ -824,6 +846,10 @@ function App() {
             path: "/terms-condition",
             element: <TermsConditons />,
         },
+        {
+            path: "*",
+            element: <Error404 />
+        }
     ]);
 
     return (

@@ -82,35 +82,34 @@ const UpdateEmployee = () => {
         }
     };
 
-    const [employeeid, setemployeeId] = useState('');
-    const [type, setType] = useState('add');
+    const [employeeid, setemployeeId] = useState("");
+    const [type, setType] = useState("add");
     const [notification, setnotification] = useState("");
-    const [value, setValue] = useState('');
-
+    const [value, setValue] = useState("");
 
     const handlePointSubmit = async (e, points, message, superManagerEmail, employeeId, superManagerName) => {
         e.preventDefault();
         try {
-            await API.post('/request',
+            await API.post(
+                "/request",
                 {
                     employeeid,
                     type,
                     value: parseInt(value),
                     notification,
                     manager: `${lowermanager.firstname} ${lowermanager.lastname}`,
-                    superManagerEmail: lowermanager.email
+                    superManagerEmail: lowermanager.email,
                 },
                 {
                     headers: {
                         "Content-Type": "application/json",
                     },
                     withCredentials: true,
-                }
+                },
             );
-            toast.success('Request sent for approval');
+            toast.success("Request sent for approval");
             await handleSendMail(e, points, message, superManagerEmail, employeeId, superManagerName);
-        }
-        catch (err) {
+        } catch (err) {
             toast.error(err.response.data.message);
             console.error(err);
         }
@@ -118,7 +117,7 @@ const UpdateEmployee = () => {
 
     useEffect(() => {
         API.get(`/employee/${LManagerCustId}`)
-            .then(res => {
+            .then((res) => {
                 const emp = res.data.employeedata;
                 setdata({
                     email: emp.email,
@@ -128,11 +127,11 @@ const UpdateEmployee = () => {
                     phone: emp.phone,
                 });
                 setemployeeId(emp.employeeid);
-            }).catch(err => {
-                console.log(err);
             })
-    }, [])
-
+            .catch((err) => {
+                console.log(err);
+            });
+    }, []);
 
     const handleSendMail = async (e, points, message, superManagerEmail, employeeId, superManagerName) => {
         e.preventDefault();
@@ -187,6 +186,7 @@ const UpdateEmployee = () => {
                 to: [superManagerEmail],
                 subject: approvalSubject,
                 html: approvalHtml,
+                
             });
             toast.success("Mail Sent");
         } catch (error) {
@@ -195,10 +195,8 @@ const UpdateEmployee = () => {
         }
     };
 
-
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
-
             {sessionStorage.getItem("adminid") || sessionStorage.getItem("managerid") ? (
                 <>
                     {/* Admin View - Update Employee */}
@@ -406,36 +404,7 @@ const UpdateEmployee = () => {
                         </form>
                     </div>
 
-
                     {/* Employee View - Points Data */}
-                    <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Employee Points Data</h1>
-                    <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6">
-                        <div className="grid grid-cols-4 gap-4 dark:text-white">
-                            <div className="flex flex-col space-y-2">
-                                <p>Doc Sales: {docs}</p>
-                                <p>Transport Sales: {transport}</p>
-                                <p>Service Sales: {service}</p>
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <p>Handling Sales: {handling}</p>
-                                <p>Freight Sales: {freight}</p>
-                                <p>New Customers: {newCustomer}</p>
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <p>New Customer Sales: {newCustomerSales}</p>
-                                <p>Digital Training: {digitalTraining ? "Yes" : "No"}</p>
-                                <p>Book Read: {bookRead ? "Yes" : "No"}</p>
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <p>Service Sold: {servicesold}</p>
-                                <p>CSR Program: {csrProgram ? "Yes" : "No"}</p>
-                                <p>Marketing Materials: {marketingMaterials}</p>
-                                <p>Estimated Points: {estimatedPoints}</p>
-                            </div>
-                        </div>
-                    </div>
-
-
 
                     {/* Give Points Section */}
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">New Points</h1>
@@ -449,7 +418,7 @@ const UpdateEmployee = () => {
                                         placeholder="Employee ID"
                                         value={data.employeeid}
                                         readOnly
-                                        className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
+                                        className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                                     />
                                 </div>
                                 <div className="flex flex-col">
@@ -459,7 +428,7 @@ const UpdateEmployee = () => {
                                         placeholder="Points"
                                         value={value}
                                         onChange={(e) => setValue(e.target.value)}
-                                        className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:bg-slate-50 focus:shadow focus:outline-none focus:border-red-500"
+                                        className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                                     />
                                 </div>
                             </div>
@@ -486,7 +455,16 @@ const UpdateEmployee = () => {
 
                             <div className="mt-6">
                                 <button
-                                    onClick={(e) => { handlePointSubmit(e, value, notification, managerdata[0]?.email, data.employeeid, `${managerdata[0]?.firstname} ${managerdata[0]?.lastname}`) }}
+                                    onClick={(e) => {
+                                        handlePointSubmit(
+                                            e,
+                                            value,
+                                            notification,
+                                            managerdata[0]?.email,
+                                            data.employeeid,
+                                            `${managerdata[0]?.firstname} ${managerdata[0]?.lastname}`,
+                                        );
+                                    }}
                                     className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700"
                                 >
                                     Submit

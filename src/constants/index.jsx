@@ -210,7 +210,7 @@ export const employeenavbarLinks = [
             {
                 label: "Monthly Sale",
                 icon: FaWpforms,
-                path: "/Employeelayout/monthlysaleform",
+                path: "/Employeelayout/saleform",
             },
             {
                 label: "FAQ",
