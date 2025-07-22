@@ -23,6 +23,7 @@ const ManageProfile = () => {
             [name]: value,
         }));
     };
+
     const handleUpdateCustomer = async (e) => {
         e.preventDefault();
         const updatedData = {
@@ -32,7 +33,7 @@ const ManageProfile = () => {
         };
 
         try {
-             await API.put(`/update-singlecustomer/${usersession}`, updatedData, {
+            await API.put(`/update-singlecustomer/${usersession}`, updatedData, {
                 headers: {
                     "Content-Type": "application/json",
                 },

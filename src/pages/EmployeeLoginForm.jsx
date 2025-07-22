@@ -14,25 +14,25 @@ function EmployeeLoginForm() {
     const navigate = useNavigate();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const { storeemployeetoken } = useAuth();
-    
-    function firemessage(){
+
+    function firemessage() {
         Swal.fire({
             title: "Contact Manager for change password",
             showClass: {
-              popup: `
+                popup: `
                 animate__animated
                 animate__fadeInUp
                 animate__faster
               `
             },
             hideClass: {
-              popup: `
+                popup: `
                 animate__animated
                 animate__fadeOutDown
                 animate__faster
               `
             }
-          });
+        });
     }
     const [data, setData] = useState({
         email: "",
@@ -60,7 +60,7 @@ function EmployeeLoginForm() {
                 email: "",
                 password: "",
             });
-            sessionStorage.setItem("employeeid",response.data.payload.employeeId);
+            sessionStorage.setItem("employeeid", response.data.payload.employeeId);
             navigate("/Employeelayout");
         } catch (err) {
             const message = err.response?.data?.message || "Login failed";
@@ -145,7 +145,7 @@ function EmployeeLoginForm() {
                     />
                 </div>
             </div>
-        </div>        
+        </div>
     );
 }
 export default EmployeeLoginForm;

@@ -1,47 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Footer } from "@/layouts/footer";
 import { toast } from "react-toastify";
 import API from "../../API/Api";
-import * as XLSX from "xlsx";
+import { useLocation } from "react-router-dom";
 
-const Monthlysaleform = () => {
-    const [excelData, setExcelData] = useState({});
-
-    const handleFileUpload = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const data = new Uint8Array(event.target.result);
-            const workbook = XLSX.read(data, { type: "array" });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const rawData = XLSX.utils.sheet_to_json(worksheet);
-
-            // Clean keys: remove \r and \n from each key
-            const cleanedData = rawData.map((row) => {
-                const cleanedRow = {};
-                for (const key in row) {
-                    const cleanKey = key.replace(/[\r\n]/g, "").trim();
-                    cleanedRow[cleanKey] = row[key];
-                }
-                return cleanedRow;
-            });
-
-            setExcelData(cleanedData);
-            if (cleanedData.length > 0) {
-                setForm((prev) => ({
-                    ...prev,
-                    ...cleanedData[0],
-                }));
-            }
-        };
-        reader.readAsArrayBuffer(file);
-        e.target.value = null; // reset input so same file can be uploaded again
-    };
-
-    const usersession = sessionStorage.getItem("employeeid");
+const Updatesaleform = () => {
+    const location = useLocation();
+    const { ID } = location.state;
     const [form, setForm] = useState({
         serviceSales: "",
         docSales: "",
@@ -51,9 +16,9 @@ const Monthlysaleform = () => {
         servicesold: "",
         newCustomer: "",
         newCustomerSales: "",
-        digitalTraining: "",
-        bookRead: "",
-        csrProgram: "",
+        digitalTraining: "no",
+        bookRead: "no",
+        csrProgram: "no",
         marketingMaterials: "",
     });
 
@@ -67,57 +32,56 @@ const Monthlysaleform = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!excelData[0]) {
-            toast.error("No Excel data found!");
-            return;
-        }
-
-        const updatedData = {
-            serviceSales: excelData[0]?.serviceSales,
-            docSales: excelData[0]?.docSales,
-            transportSales: excelData[0]?.transportSales,
-            handlingSales: excelData[0]?.handlingSales,
-            freightSales: excelData[0]?.freightSales,
-            servicesold: excelData[0]?.servicesold,
-            newCustomer: excelData[0]?.newCustomer,
-            newCustomerSales: excelData[0]?.newCustomerSales,
-            digitalTraining: form.digitalTraining,
-            bookRead: form.bookRead,
-            csrProgram: form.csrProgram,
-            marketingMaterials: excelData[0]?.marketingMaterials,
-            Id: usersession
-        };
-
         try {
-            await API.post(`/monthlysaleform`, updatedData, {
+            await API.put(`/updatesaleform/${ID}`, form, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true,
+            })
+            toast.success("updated successfully")
+        }
+        catch (err) {
+            const message = err.response.data.message;
+            toast.error(message);
+            console.log(err);
+        }
+    };
+
+    async function sale() {
+        try {
+            const res = await API.get(`/singlesaledata/${ID}`, {
                 headers: {
                     "Content-Type": "application/json",
                 },
                 withCredentials: true,
             });
-
-            toast.success("Data added successfully!");
+            setForm({
+                serviceSales: res.data.sale.serviceSales || "",
+                docSales: res.data.sale.docSales || "",
+                transportSales: res.data.sale.transportSales || "",
+                handlingSales: res.data.sale.handlingSales || "",
+                freightSales: res.data.sale.freightSales || "",
+                servicesold: res.data.sale.servicesold || "",
+                newCustomer: res.data.sale.newCustomer || "",
+                newCustomerSales: res.data.sale.newCustomerSales || "",
+                digitalTraining: res.data.sale.digitalTraining ? "yes" : "no",
+                bookRead: res.data.sale.bookRead ? "yes" : "no",
+                csrProgram: res.data.sale.csrProgram ? "yes" : "no",
+                marketingMaterials: res.data.sale.marketingMaterials || ""
+            })
         } catch (err) {
-            const message = err.response?.data?.message || "Updation failed";
-            toast.error(message);
-            console.error("update error:", err);
+            console.log(err);
         }
     };
 
+
+    useEffect(() => {
+        sale();
+    }, []);
     return (
         <div className="flex min-h-screen flex-col gap-y-4 p-4 sm:p-6">
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Monthly Sale Form</h1>
-            <div className="flex gap-x-4">
-                <p className="dark:text-white">Upload your monthly sales data in Excel format.</p>
-                <input
-                    type="file"
-                    accept=".xlsx, .xls"
-                    onChange={(e) => { handleFileUpload(e); }}
-                    className="justify-end"
-                />
-
-            </div>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Update Monthly Sale Form</h1>
 
             <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6">
                 <form onSubmit={handleSubmit}>
@@ -127,7 +91,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="serviceSales"
-                                value={excelData[0]?.serviceSales}
+                                value={form.serviceSales}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -138,7 +102,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="docSales"
-                                value={excelData[0]?.docSales}
+                                value={form.docSales}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -149,7 +113,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="transportSales"
-                                value={excelData[0]?.transportSales}
+                                value={form.transportSales}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -160,7 +124,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="handlingSales"
-                                value={excelData[0]?.handlingSales}
+                                value={form.handlingSales}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -171,7 +135,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="freightSales"
-                                value={excelData[0]?.freightSales}
+                                value={form.freightSales}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -182,7 +146,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="servicesold"
-                                value={excelData[0]?.servicesold}
+                                value={form.servicesold}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -193,7 +157,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="newCustomer"
-                                value={excelData[0]?.newCustomer}
+                                value={form.newCustomer}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -204,7 +168,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="newCustomerSales"
-                                value={excelData[0]?.newCustomerSales}
+                                value={form.newCustomerSales}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -303,7 +267,7 @@ const Monthlysaleform = () => {
                             <input
                                 type="number"
                                 name="marketingMaterials"
-                                value={excelData[0]?.marketingMaterials}
+                                value={form.marketingMaterials}
                                 onChange={handleChange}
                                 className="w-full appearance-none rounded border px-3 py-2 text-black shadow focus:border-red-500 focus:bg-slate-50 focus:shadow focus:outline-none"
                             />
@@ -324,5 +288,4 @@ const Monthlysaleform = () => {
         </div>
     );
 }
-export default Monthlysaleform;
-
+export default Updatesaleform;
