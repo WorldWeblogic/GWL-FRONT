@@ -26,7 +26,6 @@ function LineChart() {
         datasets: [
             {
                 label: "Employee Data",
-                //data: [65, 59, 80, 81, 56, 55, 40, 59, 80, 81, 56, 55],
                 data: monthlyCounts,
                 fill: false,
                 backgroundColor: "rgb(31, 77, 180)",

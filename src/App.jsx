@@ -90,7 +90,7 @@ import LManagerRoute from "./routes/LManagerRoute";
 import Updateadmin from "./routes/dashboard/Updateadmin";
 import Leaderboard from "./routes/dashboard/Leaderboard";
 import FAQ from "./routes/dashboard/FAQ";
-import MonthEndGuard from "./pages/MonthEndGaurd";
+// import MonthEndGuard from "./pages/MonthEndGaurd";
 import Error404 from "./pages/Error404";
 import Salesform from "./routes/dashboard/Salesform";
 import Updatesaleform from "./routes/dashboard/Updatesaleform";
@@ -591,7 +591,6 @@ function App() {
                             <Addupcomingoffer />
                         </ManagerRoute>)
                 },
-                // { path: "/Managerlayout/edit-upcomingoffers", element: <Editupcomingoffer /> },
                 // employee upcoming offer
                 {
                     path: "/Managerlayout/add-employee-upcomingoffers", element: (
