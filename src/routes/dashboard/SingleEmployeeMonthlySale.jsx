@@ -22,7 +22,7 @@ const SingleEmployeeMonthlySale = () => {
             });
             setsaledata(res.data.sale);
             setOriginalData(res.data.sale);
-            console.log(res);
+            //console.log(res);
         } catch (err) {
             console.log(err);
         }
