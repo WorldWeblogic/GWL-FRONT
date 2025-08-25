@@ -35,7 +35,7 @@ const CustRedeempoint = () => {
                                 <tr>
                                     <th className="px-4 py-2 text-left font-semibold">#</th>
                                     <th className="px-4 py-2 text-left font-semibold">Name</th>
-                                    <th className="px-4 py-2 text-left font-semibold">Employee ID</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Customer ID</th>
                                     <th className="px-4 py-2 text-left font-semibold">POINTS</th>
                                     <th className="px-4 py-2 text-left font-semibold">Message</th>
                                 </tr>
