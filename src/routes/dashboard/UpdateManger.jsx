@@ -166,6 +166,7 @@ const UpdateManger = () => {
                                 pattern="\d{3}-\d{2}-\d{3}"
                                 ref={phone}
                                 id="phone"
+                                maxLength={14}
                                 name="phone"
                                 value={data.phone}
                                 onChange={(e) => {

@@ -137,6 +137,7 @@ const LowerManagerEmployee = () => {
                                     <th className="px-4 py-2 text-left font-semibold">phone</th>
                                     <th className="px-4 py-2 text-left font-semibold">Total_Points</th>
                                     <th className="px-4 py-2 text-left font-semibold">Status</th>
+                                    <th className="px-2 py-2 text-left font-semibold">Redeem Point</th>
                                     <th className="px-2 py-2 text-left font-semibold">Monthly Sale</th>
                                     <th className="px-4 py-2 text-left font-semibold">Actions</th>
                                 </tr>
@@ -157,6 +158,18 @@ const LowerManagerEmployee = () => {
                                         <td className="px-4 py-3 dark:text-white">{employee.phone}</td>
                                         <td className="px-4 py-3 dark:text-white">{employee.TotalPoints}</td>
                                         <td className="px-4 py-3 dark:text-white">{employee.status}</td>
+                                        <td className="px-4 py-2 text-left font-semibold">
+                                            <Link
+                                                to={"/LowerManagerlayout/employee-redeempoint"}
+                                                state={{
+                                                    LManagerEmployeeId: employee._id,
+                                                }}
+                                            >
+                                                <button className="flex items-center gap-1 rounded bg-green-500 w-32 py-1 text-white pl-2">
+                                                    <EyeIcon size={20} />Redeem Point
+                                                </button>
+                                            </Link>
+                                        </td>
                                         <td className="px-4 py-2 text-left font-semibold">
                                             <Link
                                                 to={"/LowerManagerlayout/employee-monthly-sale"}

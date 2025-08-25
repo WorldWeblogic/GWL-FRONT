@@ -8,11 +8,12 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import API from "../../API/Api";
 import { toast } from "react-toastify";
-
 const MySwal = withReactContent(Swal);
 
 const CustomerPage = () => {
+    const customerid= sessionStorage.getItem("id");
     const { user, fetchcustomerData } = useAuth();
+    console.log(user);
     useEffect(() => {
         const id = sessionStorage.getItem("id");
         if (id) {
@@ -82,10 +83,11 @@ const CustomerPage = () => {
     const openModal = () => setShowModal(true);
     const closeModal = () => setShowModal(false);
     const [value, setvalue] = useState(0);
+
     const handleSendMail = async () => {
         try {
             const response = await API.post("/send-mail", {
-                to: "shantanu.kr.worldweblogic@gmail.com",
+                to: user.managerEmail,
                 subject: "Request for Redeem Points",
                 text: `${user.firstname} request for ${value} points for ${message}`,
             });
@@ -95,6 +97,29 @@ const CustomerPage = () => {
             toast.error(error);
         }
     };
+
+    const handleSubmit = async () => {
+        try {
+            await API.post(
+                "/custredeem",
+                { value, customerid, message, firstname: user.firstname , lastname: user.lastname , customerID: user.customerid},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                },
+            );
+            setvalue(0);
+            setmessage("");
+            closeModal();
+            toast.success("Redeem request sent to manager!");
+            handleSendMail()
+        } catch (err) {
+            toast.error("Failed to send redeem request. Please try again.");
+        }
+    };
+    
 
     const truncateText = (text, length = 50) => (text.length > length ? text.slice(0, length) + "..." : text);
     return (
@@ -182,7 +207,8 @@ const CustomerPage = () => {
                                                 toast.error("Choose valid points");
                                                 return;
                                             }
-                                            handleSendMail();
+                                            // handleSendMail();
+                                            handleSubmit();
                                         }}
                                         className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
                                     >

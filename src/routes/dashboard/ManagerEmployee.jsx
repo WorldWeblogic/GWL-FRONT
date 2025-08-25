@@ -472,7 +472,7 @@ const ManagerEmployee = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {request.map((data, index) => (
+                {request.slice().reverse().map((data, index) => (
                   <tr key={index}>
                     <td className="px-4 py-3 dark:text-white">{index + 1}</td>
                     <td className="px-4 py-3">

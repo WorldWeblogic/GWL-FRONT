@@ -155,6 +155,7 @@ const AddSuperManger = () => {
                             <input
                                 type="tel"
                                 placeholder="Phone"
+                                maxLength={14}
                                 pattern="\d{3}-\d{2}-\d{3}"
                                 ref={phone}
                                 id="phone"

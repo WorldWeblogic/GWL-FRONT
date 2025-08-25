@@ -171,6 +171,7 @@ const UpdateSuperManger = () => {
                                 placeholder="Phone"
                                 pattern="\d{3}-\d{2}-\d{3}"
                                 ref={phone}
+                                maxLength={14}
                                 id="phone"
                                 name="phone"
                                 value={data.phone}

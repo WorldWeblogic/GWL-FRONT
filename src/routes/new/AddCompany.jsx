@@ -227,6 +227,7 @@ const AddCompany = () => {
                                 type="tel"
                                 name="phone"
                                 ref={phone}
+                                maxLength={14}
                                 value={data.phone}
                                 onChange={(e) => {
                                     handleNumber(e);

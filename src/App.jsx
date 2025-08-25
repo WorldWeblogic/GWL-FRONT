@@ -100,6 +100,8 @@ import CustomerSalesform from "./routes/dashboard/CustomerSalesform";
 import CustomerMonthlysaleform from "./routes/dashboard/Customermonthlysaleform";
 import CustomerUpdatesaleform from "./routes/dashboard/CustomerUpdatesaleform";
 import Customersaleform from "./routes/dashboard/Customersaleform";
+import EmpRedeempoint from "./routes/dashboard/EmpRedeempoint";
+import CustRedeempoint from "./routes/dashboard/CustRedeempoint";
 
 function App() {
     const router = createBrowserRouter([
@@ -343,6 +345,12 @@ function App() {
                              <Customersaleform/>
                         </LManagerRoute>)
                 },
+                {
+                    path: "/LowerManagerlayout/redeem-point", element: (
+                        <LManagerRoute>
+                             <CustRedeempoint/>
+                        </LManagerRoute>)
+                },
                 // relation
                 {
                     path: "/LowerManagerlayout/relation", element: (
@@ -376,6 +384,13 @@ function App() {
                         <LManagerRoute>
                             <LowerManagerEmployee />
                         </LManagerRoute>)
+                },
+                {
+                    path: "/LowerManagerlayout/employee-redeempoint", element: (
+                        <LManagerRoute>
+                            <EmpRedeempoint />
+                        </LManagerRoute>
+                    )
                 },
                 {
                     path: "/LowerManagerlayout/add-employee", element: (

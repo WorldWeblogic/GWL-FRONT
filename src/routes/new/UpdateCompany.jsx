@@ -246,6 +246,7 @@ const UpdateCompany = () => {
                                         type="text"
                                         placeholder="Phone Number"
                                         value={data.phone}
+                                        maxLength={14}
                                         onChange={handleChange}
                                         name="phone"
                                         id="phone"

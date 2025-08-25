@@ -133,6 +133,7 @@ const LowerManagerCustomer = () => {
                                     <th className="px-4 py-2 text-left font-semibold">Customer_ID</th>
                                     <th className="px-4 py-2 text-left font-semibold">Company Name</th>
                                     <th className="px-4 py-2 text-left font-semibold">Status</th>
+                                    <th className="px-4 py-2 text-left font-semibold">Redeem Point</th>
                                     <th className="px-4 py-2 text-left font-semibold">View Sale</th>
                                     <th className="px-4 py-2 text-left font-semibold">Actions</th>
                                 </tr>
@@ -152,6 +153,18 @@ const LowerManagerCustomer = () => {
                                         <td className="px-4 py-3 dark:text-white">{customer.customerid}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer?.company[0]?.name}</td>
                                         <td className="px-4 py-3 dark:text-white">{customer.status}</td>
+                                        <td className="px-4 py-2 text-left font-semibold">
+                                            <Link
+                                                to={"/LowerManagerlayout/redeem-point"}
+                                                state={{
+                                                    LManagerCustomerId: customer._id,
+                                                }}
+                                            >
+                                                <button className="flex items-center gap-1 rounded bg-green-500 w-32 py-1 text-white pl-2">
+                                                    <EyeIcon size={20} />Redeem Point
+                                                </button>
+                                            </Link>
+                                        </td>
                                         <td className="px-4 py-2 text-left font-semibold">
                                             <Link
                                                 to={"/LowerManagerlayout/singlecustsaleform"}

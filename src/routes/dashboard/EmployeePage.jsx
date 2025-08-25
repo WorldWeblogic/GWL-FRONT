@@ -12,7 +12,8 @@ import { toast } from "react-toastify";
 const EmployeePage = () => {
     const { theme } = useTheme();
     const { singleemployee, fetchuserData } = useAuth();
-
+    const employeeid = sessionStorage.getItem("employeeid");
+    console.log(singleemployee);
     useEffect(() => {
         const employeeid = sessionStorage.getItem("employeeid");
         if (employeeid) {
@@ -51,9 +52,7 @@ const EmployeePage = () => {
     const [request, setrequest] = useState([]);
     const getallrequest = async () => {
         try {
-            const response = await API.get("/allrequest");
-            // console.log(response);
-
+            const response = await API.get("/allrequest")
             setrequest(response.data.requests);
         } catch (err) {
             console.error("get all request data failed", err);
@@ -90,12 +89,13 @@ const EmployeePage = () => {
     const openModal = () => setShowModal(true);
     const closeModal = () => setShowModal(false);
     const [value, setvalue] = useState(0);
+
     const handleSendMail = async () => {
         try {
             const response = await API.post("/send-mail", {
-                to: "dipanshupatel858@gmail.com",
-                subject: "Test Email",
-                text: "This is a test email sent from Employee Page.",
+                to: singleemployee.managerEmail,
+                subject: "Request for Redeem Points",
+                text: `${singleemployee.firstname} request for ${value} points for ${message}`,
             });
             toast.success(response.data.message);
         } catch (error) {
@@ -116,6 +116,28 @@ const EmployeePage = () => {
                 return "dark:text-white text-black";
         }
     }
+
+    const handleSubmit = async () => {
+        try {
+            await API.post(
+                "/redeem",
+                { value, employeeid, message, firstname: singleemployee.firstname , lastname: singleemployee.lastname , employeeID: singleemployee.employeeid},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                },
+            );
+            setvalue(0);
+            setmessage("");
+            closeModal();
+            toast.success("Redeem request sent to manager!");
+            handleSendMail();
+        } catch (err) {
+            toast.error("Failed to send redeem request. Please try again.");
+        }
+    };
 
     return (
         <div className="flex flex-col gap-y-4">
@@ -193,7 +215,7 @@ const EmployeePage = () => {
                                                 toast.error("Choose valid points");
                                                 return;
                                             }
-                                            handleSendMail();
+                                            handleSubmit();
                                         }}
                                         className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
                                     >
