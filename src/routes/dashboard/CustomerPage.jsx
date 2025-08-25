@@ -13,7 +13,6 @@ const MySwal = withReactContent(Swal);
 const CustomerPage = () => {
     const customerid= sessionStorage.getItem("id");
     const { user, fetchcustomerData } = useAuth();
-    console.log(user);
     useEffect(() => {
         const id = sessionStorage.getItem("id");
         if (id) {
