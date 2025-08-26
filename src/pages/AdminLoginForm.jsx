@@ -52,7 +52,7 @@ function AdminLoginForm() {
             <div className="mb-4 mt-4 flex max-w-5xl flex-col sm:mx-2 xl:flex-row">
                 {/* Left Side */}
                 <div className="w-full bg-white shadow-2xl xl:w-auto xl:rounded-bl-2xl xl:rounded-tl-2xl">
-                    <div className="mx-7 mt-14 rounded-xl bg-white shadow-2xl">
+                <div className="mx-7 mt-14 rounded-xl bg-white shadow-2xl">
                         <div className="m-10">
                             <img
                                 src={logo}
@@ -108,7 +108,7 @@ function AdminLoginForm() {
                                 Login
                             </button>
                         </div>
-                    </div>
+                </div>
                 </div>
 
                 {/* Right Side */}
@@ -116,6 +116,7 @@ function AdminLoginForm() {
                     <img
                         src={port}
                         loading="lazy"
+                        decoding="async"
                         alt="port"
                         className="hidden w-full object-cover xl:block xl:w-[400px] xl:rounded-br-2xl xl:rounded-tr-2xl"
                     />

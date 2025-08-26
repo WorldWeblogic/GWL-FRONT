@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const Customersaleform = () => {
     const location = useLocation();
-    const {Lcustomerid } = location.state;
+    const { Lcustomerid } = location.state;
     console.log(Lcustomerid);
     const [saledata, setsaledata] = useState([]);
     const [originalData, setOriginalData] = useState([]); // 🔁 Store full data
@@ -65,74 +65,55 @@ const Customersaleform = () => {
                 </button>
             </div>
 
-            <div className="rounded-xl bg-white p-4 shadow dark:bg-slate-900 sm:p-6">
-                <div className="divide-y-2 rounded-xl bg-white p-4 dark:bg-slate-900 sm:p-6">
-                    {saledata?.length > 0 ? (
-                        saledata.map((data, index) => (
-                            <div
-                                key={index}
-                                className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2"
-                            >
-                                <div className="mt-2 flex">
-                                    <p className="mb-1 dark:text-white">Created AT :</p>
-                                    <p className="ml-3 dark:text-white">{data?.createdAt.slice(0, 10).split("-").reverse().join("-")}</p>
-                                </div>
-                                <div className="mt-2 flex">
-                                    <p className="mb-1 dark:text-white">GWLHandling :</p>
-                                    <p className="ml-3 dark:text-white">{data?.GWLHandling}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">agency :</p>
-                                    <p className="ml-3 dark:text-white">{data?.agency}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">documentation :</p>
-                                    <p className="ml-3 dark:text-white">{data?.documentation}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">freight :</p>
-                                    <p className="ml-3 dark:text-white">{data?.freight}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">handling :</p>
-                                    <p className="ml-3 dark:text-white">{data?.handling}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">loading :</p>
-                                    <p className="ml-3 dark:text-white">{data?.loading}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">offloading :</p>{" "}
-                                    <p className="ml-3 dark:text-white">{data?.offloading}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">storage :</p>{" "}
-                                    <p className="ml-3 dark:text-white">{data?.storage}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">transport :</p>{" "}
-                                    <p className="ml-3 dark:text-white">{data?.transport}</p>
-                                </div>
-
-                                <div className="flex">
-                                    <p className="mb-1 dark:text-white">Points :</p>
-                                    <p className="ml-3 dark:text-white">{data?.points}</p>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="mt-4 text-center dark:text-white">No sales data available for the selected period.</div>
-                    )}
+            <div className="rounded-xl bg-white shadow dark:bg-slate-900 ">
+                <div className="rounded-xl bg-white dark:bg-slate-900 p-5 overflow-x-auto">
+                    <table className="w-full overflow-hidden rounded-lg border-gray-300">
+                        <thead>
+                            <tr className="bg-black text-white dark:bg-red-600">
+                                <td className="border px-4 py-2 font-semibold dark:text-white min-w-[120px]">Created At</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">GWLHandling</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Agency</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Documentation</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Freight</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Handling</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Loading</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Offloading</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Storage</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Transport</td>
+                                <td className="border px-4 py-2 font-semibold dark:text-white">Points</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {saledata?.length > 0 ? (
+                                saledata.map((data, index) => (
+                                    <tr key={index}>
+                                        <td className="border px-4 py-2 dark:text-white w-[250px]">
+                                            {data?.createdAt.slice(0, 10).split("-").reverse().join("-")}
+                                        </td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.GWLHandling}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.agency}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.documentation}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.freight}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.handling}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.loading}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.offloading}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.storage}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.transport}</td>
+                                        <td className="border px-4 py-2 dark:text-white">{data?.points}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={11} className="mt-4 text-center dark:text-white">
+                                        No sales data available for the selected period.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
+            
             <Footer />
         </div>
     );
